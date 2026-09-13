@@ -1,0 +1,10 @@
+{
+  "name": "Console Lucas · leads",
+  "short_name": "Leads Lucas",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#060a04",
+  "theme_color": "#060a04",
+  "lang": "fr",
+  "icons": [{ "src": "assets/logo.png", "sizes": "120x120", "type": "image/png" }]
+}
