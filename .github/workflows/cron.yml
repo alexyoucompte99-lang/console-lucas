@@ -1,0 +1,24 @@
+name: cron console Lucas
+# Toutes les 15 min : synchro iClosed + alertes Telegram (nouveau call, annulation, brief 8h, calls non remplis 20h).
+# Toute la logique et l'anti-doublon sont dans le pont Apps Script (what=cron).
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Appel du pont
+        env:
+          PONT_URL: ${{ secrets.PONT_URL }}
+          PONT_KEY: ${{ secrets.PONT_KEY }}
+        run: |
+          for i in 1 2 3; do
+            out=$(curl -sL --max-time 120 "$PONT_URL?key=$PONT_KEY&what=cron") || true
+            echo "$out" | head -c 400; echo
+            echo "$out" | grep -q '"ok":true' && exit 0
+            sleep 20
+          done
+          exit 1

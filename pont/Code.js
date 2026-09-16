@@ -27,8 +27,8 @@ const P = PropertiesService.getScriptProperties();
 const TZ = 'Europe/Paris';
 const SHEET_NAME = 'Console Lucas · leads';
 const LEADS_TAB = 'Leads';
-const LEADS_HDR = ['ID', 'Créé le', 'MAJ', 'Prénom nom', 'Téléphone', 'E-mail', 'Source', 'Date du call', 'Statut', 'Qualifié /10', 'Besoin / situation', 'Objection', 'Action suivante', 'Date de relance', 'Prix proposé', 'Encaissé', 'Vendu le', 'Notes', 'iClosed contact', 'iClosed statut auto', 'iClosed infos', 'Lien visio', 'Type de call'];
-const LEADS_KEYS = ['id', 'created', 'updated', 'name', 'phone', 'email', 'source', 'call_at', 'status', 'score', 'need', 'objection', 'next_action', 'next_at', 'price', 'paid', 'sold_at', 'notes', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event'];
+const LEADS_HDR = ['ID', 'Créé le', 'MAJ', 'Prénom nom', 'Téléphone', 'E-mail', 'Source', 'Date du call', 'Statut', 'Qualifié /10', 'Besoin / situation', 'Objection', 'Action suivante', 'Date de relance', 'Prix proposé', 'Encaissé', 'Vendu le', 'Notes', 'iClosed contact', 'iClosed statut auto', 'iClosed infos', 'Lien visio', 'Type de call', 'Résultat iClosed', 'Confirmation envoyée', 'Nb relances', 'Dernière relance'];
+const LEADS_KEYS = ['id', 'created', 'updated', 'name', 'phone', 'email', 'source', 'call_at', 'status', 'score', 'need', 'objection', 'next_action', 'next_at', 'price', 'paid', 'sold_at', 'notes', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'confirmed', 'touches', 'last_touch'];
 
 // Sheet des inscriptions au live (rempli par le webhook de la LP live-leads-and-business)
 const INSCRITS_ID = '1G-v7_Ow_jLJtu1lVMRCpsPdecrBVTBabMA71lqVPA-8';
@@ -63,6 +63,9 @@ function route(p) {
   if (p.what === 'inscrits') return inscrits();
   if (p.what === 'sync') { try { return icSync(p.force === '1' || p.force === true); } catch (e) { return { ok: false, error: String(e) }; } }
   if (p.what === 'ic_setkey') return icSetKey(p);
+  if (p.what === 'tg_setup') return tgSetup(p);
+  if (p.what === 'settings_set') return settingsSet(p);
+  if (p.what === 'cron') return cron(p);
   if (!p.what) return { ok: true, pong: true, v: 1 };
   return { ok: false, error: 'unknown what' };
 }
@@ -121,7 +124,7 @@ function rows(sh, keys) {
 
 function all() {
   const sh = tab(book(), LEADS_TAB, LEADS_HDR);
-  return { ok: true, now: stamp(), leads: rows(sh, LEADS_KEYS), ic_sync: P.getProperty('IC_LAST') || '', ic_due: Date.now() - Number(P.getProperty('IC_LAST_MS') || 0) > IC_EVERY_MS && !!P.getProperty('ICLOSED_KEY') };
+  return { ok: true, now: stamp(), leads: rows(sh, LEADS_KEYS), ic_sync: P.getProperty('IC_LAST') || '', settings: settingsGet(), tg: !!P.getProperty('TG_TOKEN'), ic_due: Date.now() - Number(P.getProperty('IC_LAST_MS') || 0) > IC_EVERY_MS && !!P.getProperty('ICLOSED_KEY') };
 }
 
 function findRow(sh, id) {
@@ -135,7 +138,7 @@ function findRow(sh, id) {
 // ---------- écriture ----------
 function clean(k, v) {
   if (v === null || v === undefined) return '';
-  if (k === 'score' || k === 'price' || k === 'paid') { const n = Number(v); return isNaN(n) || v === '' ? '' : n; }
+  if (k === 'score' || k === 'price' || k === 'paid' || k === 'touches') { const n = Number(v); return isNaN(n) || v === '' ? '' : n; }
   return String(v);
 }
 
@@ -269,14 +272,17 @@ function icPerson(calls) {
   let status;
   const lastTime = new Date(last.dateTimeUTC).getTime();
   const old = now - lastTime > 30 * 86400000;
+  const stale = now - lastTime > 45 * 86400000; // au-delà : plus une relance, une réactivation
   if (deals.length || tasks.some(x => x.t.outcome === 'WON')) status = 'vendu';
   else if (!icCancelled(last) && lastTime > now) status = 'booke';
   else if (icCancelled(last)) status = old ? 'ancien' : 'a_appeler';
   else if (lastTask.outcome === 'NO_SALE') {
     const r = lastTask.noSaleReason;
-    status = r === 'FOLLOW_UP_SCHEDULE' ? 'followup' : r === 'NO_SHOW' ? 'noshow' : ['UNQUALIFIED', 'NOT_INTERESTED', 'CONTACT_CANCELLED', 'ADMIN_CANCELLED'].includes(r) ? 'perdu' : 'fait';
+    status = r === 'FOLLOW_UP_SCHEDULE' ? (stale ? 'ancien' : 'followup') : r === 'NO_SHOW' ? (stale ? 'ancien' : 'noshow') : ['UNQUALIFIED', 'NOT_INTERESTED', 'CONTACT_CANCELLED', 'ADMIN_CANCELLED'].includes(r) ? 'perdu' : 'fait';
   } else status = old ? 'ancien' : 'booke'; // passé sans résultat : récent = à renseigner, ancien = archive
 
+  const result = status === 'vendu' ? 'Vendu' : !icCancelled(last) && lastTime > now ? 'Call à venir' : icCancelled(last) ? 'Annulé'
+    : lastTask.outcome === 'NO_SALE' ? (IC_NOSALE[lastTask.noSaleReason] || 'Pas de vente') : 'Sans résultat';
   const ready = pick(/échelle de 1 à 10/i);
   const need = [
     pick(/en quoi puis-je/i) && 'Besoin : ' + pick(/en quoi puis-je/i),
@@ -313,7 +319,9 @@ function icPerson(calls) {
     objection: obj ? (IC_OBJ[obj] !== undefined ? IC_OBJ[obj] : obj.toLowerCase().replace(/_/g, ' ')) : '',
     price: price || '', sold_at: soldAt, notes,
     created: icLocal(first.createdAt || first.dateTimeUTC).replace(/$/, ':00'),
-    ic_info: info, ic_link: !icCancelled(last) && lastTime > now ? (last.locationLinkInvitee || last.locationLink || '') : '', ic_event: (last.event || {}).name || '',
+    ic_info: info, ic_link: !icCancelled(last) && lastTime > now ? (last.locationLinkInvitee || last.locationLink || '') : '', ic_event: (last.event || {}).name || '', ic_result: result,
+    next_at: status === 'followup' ? Utilities.formatDate(new Date(lastTime + 86400000), TZ, 'yyyy-MM-dd') : status === 'noshow' || status === 'a_appeler' ? Utilities.formatDate(new Date(Math.max(lastTime, now)), TZ, 'yyyy-MM-dd') : '',
+    next_action: status === 'followup' ? 'Relance follow-up' : status === 'noshow' ? 'Reprogrammer le call' : status === 'a_appeler' ? 'Call annulé : relancer' : '',
   };
 }
 
@@ -348,7 +356,7 @@ function icSync(force) {
       if (icDigits(r[col('phone')])) byPhone[icDigits(r[col('phone')])] = i;
     });
     const stampNow = stamp();
-    const ALWAYS = ['ic_contact', 'ic_info', 'ic_link', 'ic_event', 'call_at'];
+    const ALWAYS = ['ic_contact', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'call_at'];
     let created = 0, updated = 0;
     const touched = new Set();
     const fresh = [];
@@ -365,10 +373,16 @@ function icSync(force) {
       const r = data[i];
       let changed = false;
       const set = (k, v) => { const c = col(k); if (String(r[c]) !== String(v)) { r[c] = v; changed = true; } };
+      const prevCall = String(r[col('call_at')] || '').slice(0, 16);
       ALWAYS.forEach(k => { if (k === 'call_at' && r[col('call_at')] && String(r[col('call_at')]).slice(0, 16) > f.call_at) return; set(k, clean(k, f[k])); });
       ['name', 'email', 'phone', 'source', 'score', 'need', 'objection', 'price', 'sold_at', 'notes'].forEach(k => { if (r[col(k)] === '' && f[k] !== '') set(k, clean(k, f[k])); });
       const cur = String(r[col('status')] || ''), auto = String(r[col('ic_status')] || '');
-      if (!cur || cur === auto) { set('status', f.status); }
+      const newBooking = f.status === 'booke' && f.call_at > prevCall && f.call_at > icLocal(new Date().toISOString());
+      if (!cur || cur === auto || newBooking) {
+        set('status', f.status);
+        if (newBooking) { set('confirmed', ''); }
+        if (f.next_at && r[col('next_at')] === '' && f.status !== auto) { set('next_at', f.next_at); set('next_action', f.next_action); }
+      }
       set('ic_status', f.status);
       if (changed) { r[col('updated')] = stampNow; updated++; touched.add(i); }
     });
@@ -382,10 +396,128 @@ function icSync(force) {
     }
     P.setProperty('IC_LAST_MS', String(Date.now()));
     P.setProperty('IC_LAST', stampNow);
+    icWatch(calls);
     return { ok: true, calls: calls.length, people: Object.keys(groups).length, created, updated };
   } finally {
     lock.releaseLock();
   }
+}
+
+// ---------- réglages partagés (objectifs + messages WhatsApp) ----------
+function settingsGet() { try { return JSON.parse(P.getProperty('SETTINGS') || '{}'); } catch (e) { return {}; } }
+function settingsSet(p) {
+  const cur = settingsGet();
+  const next = Object.assign(cur, p.settings || {});
+  P.setProperty('SETTINGS', JSON.stringify(next));
+  return { ok: true, settings: next };
+}
+
+// ---------- Telegram (bot To do Alex) ----------
+function tgSetup(p) {
+  if (P.getProperty('TG_TOKEN') && !p.force) return { ok: false, error: 'déjà configuré' };
+  if (!/^\d+:[\w-]+$/.test(String(p.token || '')) || !/^-?\d+$/.test(String(p.chat || ''))) return { ok: false, error: 'token ou chat invalide' };
+  P.setProperty('TG_TOKEN', String(p.token));
+  P.setProperty('TG_CHAT', String(p.chat));
+  return { ok: true };
+}
+function tg(text) {
+  const token = P.getProperty('TG_TOKEN'), chat = P.getProperty('TG_CHAT');
+  if (!token || !chat) return false;
+  const res = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    method: 'post', muteHttpExceptions: true,
+    payload: { chat_id: chat, text: text, parse_mode: 'HTML', disable_web_page_preview: 'true' },
+  });
+  return res.getResponseCode() === 200;
+}
+function h(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+const CONSOLE_URL = 'https://alexyoucompte99-lang.github.io/console-lucas/';
+
+// Nouveaux calls bookés / annulés : compare les calls à venir avec ceux vus au passage précédent
+function icWatch(calls) {
+  const now = Date.now();
+  const up = {};
+  calls.forEach(c => { if (!icCancelled(c) && new Date(c.dateTimeUTC).getTime() > now) up[c.id] = { n: String(c.inviteeName || '').trim(), d: icLocal(c.dateTimeUTC), e: (c.event || {}).name || '' }; });
+  const prevRaw = P.getProperty('IC_UPCOMING');
+  P.setProperty('IC_UPCOMING', JSON.stringify(up));
+  if (!prevRaw) return; // premier passage : on mémorise sans notifier
+  const prev = JSON.parse(prevRaw);
+  const byId = {}; calls.forEach(c => byId[c.id] = c);
+  Object.keys(up).forEach(id => {
+    if (prev[id]) return;
+    const c = byId[id];
+    const ans = (c.secondaryAnswers || []).map(q => [q.statement, icAnswer(q.answer)]).filter(x => x[1] && /en quoi|pourquoi souhaitez|TJM|échelle/i.test(x[0]));
+    tg('📅 <b>Nouveau call booké</b> · Lucas\n' + h(up[id].n) + '\n' + h(up[id].d.replace('T', ' à ').replace(':', 'h')) + ' · ' + h(up[id].e) +
+      (c.phoneNumber ? '\n' + h(c.phoneNumber) : '') + (ans.length ? '\n\n' + ans.map(x => '• ' + h(x[1])).join('\n') : '') + '\n\n<a href="' + CONSOLE_URL + '">Ouvrir la console</a>');
+  });
+  Object.keys(prev).forEach(id => {
+    if (up[id]) return;
+    const c = byId[id];
+    if (c && icCancelled(c)) tg('❌ <b>Call annulé</b> · Lucas\n' + h(prev[id].n) + ' (' + h(prev[id].d.replace('T', ' à ').replace(':', 'h')) + ')' + (c.cancelReason ? '\nRaison : ' + h(c.cancelReason) : '') + '\nÀ relancer pour recaler.');
+  });
+}
+
+// ---------- cron (GitHub Actions toutes les 15 min) ----------
+// synchro iClosed + alertes (nouveau call, annulation) + brief 8h + calls non remplis 20h, une fois par jour chacun
+function cron(p) {
+  const outp = { ok: true };
+  try { outp.sync = icSync(true); } catch (e) { outp.sync = { ok: false, error: String(e) }; }
+  const hour = Number(Utilities.formatDate(new Date(), TZ, 'H'));
+  const today = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+  if ((hour >= 8 && hour < 12 && P.getProperty('BRIEF_DAY') !== today) || p.test === 'brief') {
+    if (tg(brief(today))) { if (p.test !== 'brief') P.setProperty('BRIEF_DAY', today); outp.brief = true; }
+  }
+  if ((hour >= 20 && P.getProperty('SOIR_DAY') !== today) || p.test === 'soir') {
+    const txt = soir(today);
+    if (txt) tg(txt);
+    if (p.test !== 'soir') P.setProperty('SOIR_DAY', today);
+    outp.soir = !!txt;
+  }
+  return outp;
+}
+
+function leadsNow() { return rows(tab(book(), LEADS_TAB, LEADS_HDR), LEADS_KEYS); }
+function addDaysIso(iso, n) { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return Utilities.formatDate(d, TZ, 'yyyy-MM-dd'); }
+const OPEN_ST = ['a_appeler', 'booke', 'fait', 'followup', 'noshow'];
+
+function monthStats(leads, m) {
+  const calls = leads.filter(l => String(l.call_at).slice(0, 7) === m && String(l.call_at).slice(0, 10) <= Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd'));
+  const shows = calls.filter(l => ['fait', 'followup', 'vendu', 'perdu'].includes(l.status)).length;
+  const noshow = calls.filter(l => l.status === 'noshow').length;
+  const ventes = leads.filter(l => l.status === 'vendu' && String(l.sold_at).slice(0, 7) === m);
+  const ca = ventes.reduce((a, l) => a + (Number(l.price) || 0), 0);
+  const cash = ventes.reduce((a, l) => a + (Number(l.paid) || 0), 0);
+  return { calls: calls.length, shows, noshow, ventes: ventes.length, ca, cash };
+}
+
+function brief(today) {
+  const L = leadsNow();
+  const S = settingsGet();
+  const tomorrow = addDaysIso(today, 1);
+  const eur = n => Math.round(n).toLocaleString('fr-FR') + ' €';
+  const callsToday = L.filter(l => String(l.call_at).slice(0, 10) === today && l.status !== 'perdu').sort((a, b) => String(a.call_at).localeCompare(String(b.call_at)));
+  const toFill = L.filter(l => l.call_at && String(l.call_at).slice(0, 10) < today && String(l.call_at).slice(0, 10) >= addDaysIso(today, -30) && ['booke', 'a_appeler'].includes(l.status));
+  const late = L.filter(l => l.next_at && OPEN_ST.includes(l.status) && String(l.next_at).slice(0, 10) <= today);
+  const tom = L.filter(l => String(l.call_at).slice(0, 10) === tomorrow && l.status === 'booke');
+  const m = today.slice(0, 7);
+  const st = monthStats(L, m);
+  const obj = Number(S.objectif_ca) || 0;
+  const day = Number(today.slice(8, 10)), dim = new Date(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 0).getDate();
+  const proj = day > 1 ? st.ca / (day - 1) * dim : 0;
+  let t = '☀️ <b>Lucas · brief du ' + Utilities.formatDate(new Date(), TZ, 'd/MM') + '</b>\n\n';
+  t += '📞 <b>Calls aujourd\'hui : ' + callsToday.length + '</b>\n' + (callsToday.length ? callsToday.map(l => '• ' + String(l.call_at).slice(11, 16).replace(':', 'h') + ' ' + h(l.name) + (l.confirmed ? ' ✅' : ' (pas confirmé)')).join('\n') + '\n' : '');
+  if (tom.length) t += '🗓 Demain : ' + tom.length + ' call' + (tom.length > 1 ? 's' : '') + ' à confirmer\n';
+  t += '\n🔁 <b>Relances à faire : ' + late.length + '</b>\n' + late.slice(0, 8).map(l => '• ' + h(l.name) + ' · ' + h(l.next_action || 'relance')).join('\n') + (late.length > 8 ? '\n• +' + (late.length - 8) + ' autres' : '') + '\n';
+  if (toFill.length) t += '\n⚠️ <b>' + toFill.length + ' call' + (toFill.length > 1 ? 's' : '') + ' sans résultat</b> (à remplir)\n';
+  t += '\n📊 <b>Mois en cours</b>\nCalls passés ' + st.calls + ' · show-up ' + (st.shows + st.noshow ? Math.round(100 * st.shows / (st.shows + st.noshow)) + ' %' : '–') + ' · ventes ' + st.ventes + ' · closing ' + (st.shows ? Math.round(100 * st.ventes / st.shows) + ' %' : '–') + '\nCA signé ' + eur(st.ca) + (obj ? ' / ' + eur(obj) + ' (projection ' + eur(proj) + ')' : '') + '\n';
+  t += '\n<a href="' + CONSOLE_URL + '">Ouvrir la console</a>';
+  return t;
+}
+
+function soir(today) {
+  const L = leadsNow();
+  const miss = L.filter(l => String(l.call_at).slice(0, 10) === today && ['booke', 'a_appeler'].includes(l.status));
+  if (!miss.length) return '';
+  return '🌙 <b>Lucas · ' + miss.length + ' call' + (miss.length > 1 ? 's' : '') + ' du jour sans résultat</b>\n' + miss.map(l => '• ' + String(l.call_at).slice(11, 16).replace(':', 'h') + ' ' + h(l.name)).join('\n') + '\n\nVenu ? Vendu ? Follow-up ? 30 secondes dans la console.\n<a href="' + CONSOLE_URL + '">Remplir</a>';
 }
 
 function out(o) {

@@ -44,3 +44,10 @@ puis http://127.0.0.1:8967/ (sans pont, la page passe en « hors ligne · copie 
 Le pont synchronise les réservations iClosed de Lucas (API publique, clé dans les ScriptProperties `ICLOSED_KEY`, copie locale `pont/iclosed-key.txt` gitignorée).
 Une fiche par personne, les champs iClosed ne remplissent que les cases vides, le statut n'est changé que s'il n'a pas été modifié à la main (colonne « iClosed statut auto »).
 La console lance `what=sync` après chargement si la dernière synchro date de plus de 10 min ; bouton « Synchro iClosed » dans Calls à venir. Podcast et recrutement ignorés.
+
+## Refonte closing (16/09/2026)
+- Onglets : Aujourd'hui (objectifs du mois, goulot, à remplir, calls du jour, relances, demain à confirmer, remplir l'agenda), Leads, Calls, Chiffres, Inscrits live.
+- Résultat en 1 clic : Follow-up = relance J+1 puis J+2, J+3, J+7 à chaque WhatsApp envoyé ; No-show = recaler le jour même ; Vendu = montant demandé.
+- « Envoyer un par un » pour les relances du jour et la réactivation des anciens leads (> 45 j).
+- Réglages (⚙) partagés via le pont : objectifs, signature, lien iClosed, 6 messages WhatsApp à variables.
+- Automatisations : `.github/workflows/cron.yml` toutes les 15 min appelle `what=cron` (secrets PONT_URL, PONT_KEY) : synchro iClosed, Telegram @AlexTodoRecapBot (nouveau call booké, annulation, brief 8h, calls du jour non remplis 20h). Token Telegram dans les ScriptProperties (what=tg_setup).
