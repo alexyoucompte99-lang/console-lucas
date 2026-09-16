@@ -39,3 +39,8 @@ Jamais `clasp deploy` (nouvelle URL). Piège connu : `clasp create-script` écra
 python3 -m http.server 8967 --directory . &
 ```
 puis http://127.0.0.1:8967/ (sans pont, la page passe en « hors ligne · copie locale » et garde tout en localStorage).
+
+## iClosed (16/09/2026)
+Le pont synchronise les réservations iClosed de Lucas (API publique, clé dans les ScriptProperties `ICLOSED_KEY`, copie locale `pont/iclosed-key.txt` gitignorée).
+Une fiche par personne, les champs iClosed ne remplissent que les cases vides, le statut n'est changé que s'il n'a pas été modifié à la main (colonne « iClosed statut auto »).
+La console lance `what=sync` après chargement si la dernière synchro date de plus de 10 min ; bouton « Synchro iClosed » dans Calls à venir. Podcast et recrutement ignorés.

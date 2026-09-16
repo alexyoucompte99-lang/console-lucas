@@ -197,6 +197,7 @@ input[type=date].inp,input[type=datetime-local].inp{min-height:46px;-webkit-appe
 .callrow{display:flex;gap:10px;align-items:flex-start}
 .callrow .time{flex:none;font-family:var(--mono);font-size:13px;color:var(--vert);width:52px;padding-top:4px}
 .callrow .body{flex:1;min-width:0}
+.icinfo{margin-top:14px}.icinfo summary{cursor:pointer;color:var(--vert);font-size:13px;font-weight:600}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 @media(max-width:520px){.brand h1{font-size:20px}.brand img{width:34px;height:34px}.lead .name{font-size:20px}.right{width:100%;justify-content:space-between;margin-left:0}.right .status{order:-1;max-width:80vw}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -225,12 +226,12 @@ input[type=date].inp,input[type=datetime-local].inp{min-height:46px;-webkit-appe
 const PONT = 'https://script.google.com/macros/s/AKfycbxYA0m2mWxXPoHFcPHDt-5N-sqrs2sHQw_YyoIM7g_5UX1V7Eg4Gji0rIBTXNy649g0dA/exec';
 const KEY = 'lucas-759dc1a01a28ae1d91ac25c8';
 const CODE = 'lucas26';
-const SOURCES = [['live', 'Live'], ['lp', 'LP'], ['insta', 'Insta'], ['reco', 'Recommandation'], ['autre', 'Autre']];
+const SOURCES = [['live', 'Live'], ['lp', 'LP'], ['insta', 'Insta'], ['linkedin', 'LinkedIn'], ['setter', 'Setter'], ['iclosed', 'iClosed'], ['reco', 'Recommandation'], ['autre', 'Autre']];
 const STATUS = [
   ['a_appeler', 'À appeler', 's-todo'], ['booke', 'Call booké', 's-booke'], ['fait', 'Call fait', 's-fait'],
-  ['followup', 'Follow-up', 's-followup'], ['vendu', 'Vendu', 's-vendu'], ['perdu', 'Perdu', 's-perdu'], ['noshow', 'No-show', 's-noshow'],
+  ['followup', 'Follow-up', 's-followup'], ['vendu', 'Vendu', 's-vendu'], ['perdu', 'Perdu', 's-perdu'], ['noshow', 'No-show', 's-noshow'], ['ancien', 'Ancien call', ''],
 ];
-const CLOSED = ['vendu', 'perdu'];
+const CLOSED = ['vendu', 'perdu', 'ancien'];
 const TABS = [['leads', 'Leads'], ['calls', 'Calls à venir'], ['ventes', 'Ventes'], ['inscrits', 'Inscrits au live']];
 
 // ---------- état ----------
@@ -243,6 +244,7 @@ let formOpen = false, formPrefill = null;
 let online = null;
 let month = '';
 let inscritsLoaded = false, inscritsBusy = false;
+let icSync = '', icBusy = false;
 
 // ---------- utils ----------
 const $ = s => document.querySelector(s);
@@ -271,7 +273,7 @@ function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.classNa
 function setStatus(txt, cls) { $('#status').className = 'status ' + (cls || ''); $('#status-t').textContent = txt; }
 function norm(l) {
   l.id = String(l.id || newId());
-  ['name', 'phone', 'email', 'source', 'status', 'need', 'objection', 'next_action', 'notes', 'created', 'updated'].forEach(k => { l[k] = l[k] == null ? '' : String(l[k]); });
+  ['name', 'phone', 'email', 'source', 'status', 'need', 'objection', 'next_action', 'notes', 'created', 'updated', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event'].forEach(k => { l[k] = l[k] == null ? '' : String(l[k]); });
   l.status = l.status || 'a_appeler';
   l.score = l.score === '' || l.score == null ? '' : Number(l.score) || '';
   l.price = l.price === '' || l.price == null ? '' : Number(l.price) || '';
@@ -343,7 +345,9 @@ async function load(silent) {
     S.leads = (j.leads || []).map(norm);
     saveLocal();
     online = true;
-    setStatus('en direct · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+    icSync = j.ic_sync || '';
+    setStatus('en direct · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + (icSync ? ' · iClosed ' + fmtTime(icSync) : ''));
+    if (j.ic_due) syncIclosed(false);
   } catch (e) {
     loadLocal();
     online = false;
@@ -351,6 +355,21 @@ async function load(silent) {
     setStatus('hors ligne · copie locale' + (q.length ? ` · ${q.length} en attente` : ''), 'err');
   }
   render();
+}
+// Synchro iClosed côté pont (20 à 40 s), puis rechargement silencieux
+async function syncIclosed(force) {
+  if (icBusy) return;
+  icBusy = true;
+  if (force) { setStatus('synchro iClosed…', 'busy'); render(); }
+  try {
+    const j = await get('sync' + (force ? '&force=1' : ''));
+    if (force) toast(j.created || j.updated ? `iClosed : ${j.created} nouveau(x), ${j.updated} mis à jour` : 'iClosed : rien de nouveau');
+    icBusy = false;
+    await load(true);
+  } catch (e) {
+    icBusy = false;
+    if (force) { toast('Synchro iClosed impossible', true); load(true); }
+  }
 }
 async function loadInscrits(force) {
   if (inscritsBusy) return;
@@ -389,7 +408,7 @@ function sortLeads(a, b) {
   const t = TODAY(), ra = rank(a, t), rb = rank(b, t);
   if (ra !== rb) return ra - rb;
   if (ra <= 2) return a.next_at.localeCompare(b.next_at);
-  return String(b.updated || b.created).localeCompare(String(a.updated || a.created));
+  return String(b.call_at || b.created).localeCompare(String(a.call_at || a.created));
 }
 function upcomingCalls() { const t = TODAY(); return S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) >= t && l.status !== 'perdu'); }
 
@@ -423,7 +442,7 @@ function vLeads() {
   html += `<div class="filters">
     <div class="search"><input class="inp" type="search" placeholder="Rechercher un nom" value="${esc(search)}" oninput="search=this.value;renderList()"></div>
     <div class="pills ${filter === 'late' ? 'late' : ''}" id="pills">
-      <button class="${filter === 'tous' ? 'on' : ''}" onclick="setFilter('tous')">Tous <span class="c">${S.leads.length}</span></button>
+      <button class="${filter === 'tous' ? 'on' : ''}" onclick="setFilter('tous')">En cours <span class="c">${S.leads.length - (counts.ancien || 0)}</span></button>
       ${late ? `<button class="${filter === 'late' ? 'on' : ''}" style="${filter === 'late' ? '' : 'color:var(--rouge);border-color:rgba(255,109,112,.35)'}" onclick="setFilter('late')">Relances échues <span class="c">${late}</span></button>` : ''}
       ${STATUS.map(([k, l, c]) => `<button class="${filter === k ? 'on ' + c : ''} ${counts[k] ? '' : 'zero'}" onclick="setFilter('${k}')">${l} <span class="c">${counts[k]}</span></button>`).join('')}
     </div></div>
@@ -434,7 +453,7 @@ function setFilter(f) { filter = f; render(); }
 function renderList() { const el = $('#list'); if (el) el.innerHTML = listHtml(); }
 function listHtml() {
   const t = TODAY(), q = search.trim().toLowerCase();
-  let arr = S.leads.filter(l => filter === 'tous' ? true : filter === 'late' ? rank(l, t) === 0 : l.status === filter);
+  let arr = S.leads.filter(l => filter === 'tous' ? (l.status !== 'ancien' || !!q) : filter === 'late' ? rank(l, t) === 0 : l.status === filter);
   if (q) arr = arr.filter(l => (l.name + ' ' + l.email + ' ' + l.phone).toLowerCase().includes(q));
   arr.sort(sortLeads);
   if (!arr.length) return `<div class="card"><div class="empty">Aucun lead ici.</div></div>`;
@@ -463,6 +482,7 @@ function leadSummary(l) {
   const t = TODAY();
   const chips = [];
   if (l.source) chips.push(`<span class="chip">${esc(srcLabel(l.source))}</span>`);
+  if (l.ic_event) chips.push(`<span class="chip">${esc(l.ic_event)}</span>`);
   if (l.score !== '') chips.push(`<span class="chip ${l.score >= 7 ? 'v' : l.score <= 4 ? 'r' : 'o'}">${l.score}/10</span>`);
   if (l.call_at) { const past = l.call_at.slice(0, 10) < t; chips.push(`<span class="chip ${past ? '' : 'o'}">Call ${fmtDT(l.call_at)}</span>`); }
   if (l.price !== '' && l.price) chips.push(`<span class="chip mono">${euro(l.price)}${l.paid ? ' · encaissé ' + euro(l.paid) : ''}</span>`);
@@ -504,9 +524,10 @@ function leadEditor(l) {
       <div><span class="lbl">Encaissé (€)</span>${f('paid', 'number', '0', 'inputmode="numeric" min="0" step="1"')}</div>
       <div><span class="lbl">Vendu le</span>${f('sold_at', 'date')}</div>
     </div>
+    ${l.ic_info ? `<details class="icinfo"><summary>Historique iClosed</summary><div class="wa-prev">${esc(l.ic_info)}</div></details>` : ''}
     <span class="lbl">Notes</span>
     <textarea class="inp tall" placeholder="Colle ici tes prises de notes du call" onchange="upd('${id}','notes',this.value,true)">${esc(l.notes)}</textarea>
-    ${l.phone ? `<div class="actions"><a class="btn wa sm" href="${waLink(l)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn sec2 sm" href="tel:${esc(phoneDigits(l.phone) ? '+' + phoneDigits(l.phone) : l.phone)}">Appeler</a>${l.email ? `<a class="btn sec2 sm" href="mailto:${esc(l.email)}">Mail</a>` : ''}</div>` : ''}
+    ${l.phone ? `<div class="actions">${l.ic_link ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}<a class="btn wa sm" href="${waLink(l)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn sec2 sm" href="tel:${esc(phoneDigits(l.phone) ? '+' + phoneDigits(l.phone) : l.phone)}">Appeler</a>${l.email ? `<a class="btn sec2 sm" href="mailto:${esc(l.email)}">Mail</a>` : ''}</div>` : ''}
     <div class="meta-line">Créé ${fmtDT(l.created) || '?'}${l.updated ? ' · modifié ' + fmtDT(l.updated) : ''}</div>
     <div class="row"><button class="btn danger sm" onclick="delLead('${id}')">Supprimer</button><button class="btn ghost sm" onclick="toggleCard('${id}')">Fermer</button></div>
   </div>`;
@@ -589,8 +610,8 @@ function vCalls() {
   const up = upcomingCalls().sort((a, b) => a.call_at.localeCompare(b.call_at));
   const g = { today: up.filter(l => l.call_at.slice(0, 10) === t), tomorrow: up.filter(l => l.call_at.slice(0, 10) === tm), later: up.filter(l => l.call_at.slice(0, 10) > tm) };
   const stale = S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) < t && ['booke', 'a_appeler'].includes(l.status)).sort((a, b) => b.call_at.localeCompare(a.call_at));
-  let html = '';
-  if (!up.length) html += `<div class="card"><div class="empty"><div class="big">Aucun call à venir</div>Renseigne la date du call sur la fiche d'un lead pour le voir ici.</div></div>`;
+  let html = `<div class="row" style="margin:0 0 12px"><span class="hint">${icSync ? 'iClosed synchronisé à ' + fmtTime(icSync) + ' (auto toutes les 10 min)' : 'iClosed pas encore synchronisé'}</span><button class="btn sec2 sm" ${icBusy ? 'disabled' : ''} onclick="syncIclosed(true)">${icBusy ? 'Synchro…' : 'Synchro iClosed'}</button></div>`;
+  if (!up.length) html += `<div class="card"><div class="empty"><div class="big">Aucun call à venir</div>Les calls réservés sur iClosed arrivent ici tout seuls. Tu peux aussi renseigner la date du call sur une fiche.</div></div>`;
   [['today', "Aujourd'hui"], ['tomorrow', 'Demain'], ['later', 'Plus tard']].forEach(([k, lb]) => {
     if (!g[k].length) return;
     html += `<div class="sec">${lb} <span class="n">${g[k].length}</span></div>` + g[k].map(l => callCard(l, k === 'later')).join('');
@@ -601,10 +622,11 @@ function vCalls() {
 function callCard(l, showDate, stale) {
   return `<div class="card"><div class="callrow"><div class="time">${fmtTime(l.call_at) || '--h--'}</div><div class="body">
     <div class="name" style="font-family:var(--display);font-size:21px;line-height:1.05">${esc(l.name)}</div>
-    <div class="chips">${showDate ? `<span class="chip o">${fmtDate(l.call_at, { weekday: 'long', day: 'numeric', month: 'long' })}</span>` : ''}<span class="chip">${stLabel(l.status)}</span>${l.source ? `<span class="chip">${esc(srcLabel(l.source))}</span>` : ''}${l.score !== '' ? `<span class="chip ${l.score >= 7 ? 'v' : 'o'}">${l.score}/10</span>` : ''}</div>
+    <div class="chips">${showDate ? `<span class="chip o">${fmtDate(l.call_at, { weekday: 'long', day: 'numeric', month: 'long' })}</span>` : ''}${l.ic_event ? `<span class="chip">${esc(l.ic_event)}</span>` : ''}<span class="chip">${stLabel(l.status)}</span>${l.source ? `<span class="chip">${esc(srcLabel(l.source))}</span>` : ''}${l.score !== '' ? `<span class="chip ${l.score >= 7 ? 'v' : 'o'}">${l.score}/10</span>` : ''}</div>
     ${l.need ? `<div class="need">${esc(l.need)}</div>` : ''}
     <div class="actions">
       ${l.phone && !stale ? `<a class="btn wa sm" href="${waLink(l)}" target="_blank" rel="noopener">Confirmer sur WhatsApp</a>` : ''}
+      ${l.ic_link && !stale ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}
       ${stale ? `<button class="btn sm" onclick="quickStatus('${l.id}','fait')">Call fait</button><button class="btn danger sm" onclick="quickStatus('${l.id}','noshow')">No-show</button>` : ''}
       <button class="btn ghost sm" onclick="goLead('${l.id}')">Ouvrir la fiche</button>
     </div>
