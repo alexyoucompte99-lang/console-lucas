@@ -12,12 +12,19 @@
 //   all        {}                        tous les leads
 //   upsert     { lead:{ id?, … } }       crée (sans id) ou met à jour (avec id) un lead, renvoie { ok, id }
 //   delete     { id }                    supprime la ligne
+//   call_upsert { call:{ id, … }, lead?:{ id, … }, create? }  met à jour un call (onglet Calls ; create:true pour en créer un) et, dans le même verrou,
+//                                        applique les changements de la fiche lead (jamais créée ici)
+//   call_delete { id }                   supprime un call ajouté à la main
 //   inscrits   {}                        inscrits au live
+//
+// Onglet Calls (17/09/2026) : une ligne par call (réservation iClosed ou call ajouté dans la console),
+// pour le suivi des calls passés et des stats justes quand un lead a plusieurs calls.
 
 // À exécuter une fois dans l'éditeur pour accorder les autorisations (Sheets)
 function autoriser() {
   const ss = book();
   tab(ss, LEADS_TAB, LEADS_HDR);
+  tab(ss, CALLS_TAB, CALLS_HDR);
   SpreadsheetApp.openById(INSCRITS_ID).getName();
   Logger.log('OK ' + ss.getUrl());
 }
@@ -27,8 +34,16 @@ const P = PropertiesService.getScriptProperties();
 const TZ = 'Europe/Paris';
 const SHEET_NAME = 'Console Lucas · leads';
 const LEADS_TAB = 'Leads';
-const LEADS_HDR = ['ID', 'Créé le', 'MAJ', 'Prénom nom', 'Téléphone', 'E-mail', 'Source', 'Date du call', 'Statut', 'Qualifié /10', 'Besoin / situation', 'Objection', 'Action suivante', 'Date de relance', 'Prix proposé', 'Encaissé', 'Vendu le', 'Notes', 'iClosed contact', 'iClosed statut auto', 'iClosed infos', 'Lien visio', 'Type de call', 'Résultat iClosed', 'Confirmation envoyée', 'Nb relances', 'Dernière relance'];
-const LEADS_KEYS = ['id', 'created', 'updated', 'name', 'phone', 'email', 'source', 'call_at', 'status', 'score', 'need', 'objection', 'next_action', 'next_at', 'price', 'paid', 'sold_at', 'notes', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'confirmed', 'touches', 'last_touch'];
+const LEADS_HDR = ['ID', 'Créé le', 'MAJ', 'Prénom nom', 'Téléphone', 'E-mail', 'Source', 'Date du call', 'Statut', 'Qualifié /10', 'Besoin / situation', 'Objection', 'Action suivante', 'Date de relance', 'Prix proposé', 'Encaissé', 'Vendu le', 'Notes', 'iClosed contact', 'iClosed statut auto', 'iClosed infos', 'Lien visio', 'Type de call', 'Résultat iClosed', 'Confirmation envoyée', 'Nb relances', 'Dernière relance', 'Offre', 'Paiement', 'Température'];
+const LEADS_KEYS = ['id', 'created', 'updated', 'name', 'phone', 'email', 'source', 'call_at', 'status', 'score', 'need', 'objection', 'next_action', 'next_at', 'price', 'paid', 'sold_at', 'notes', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'confirmed', 'touches', 'last_touch', 'offer', 'payment', 'temp'];
+// Une ligne par call. kind : r1 | suivi | client ; ic_state : a_venir | passe | annule (iClosed) ;
+// show : present | noshow | reporte | annule ; result : vendu | followup | perdu | non_qualifie ; temp : chaud | tiede | froid ;
+// objection : plusieurs objections séparées par « · » ; conf_sent : message de confirmation envoyé le ; conf_reply : ok | decale | rien
+const CALLS_TAB = 'Calls';
+const CALLS_HDR = ['ID', 'Lead', 'Créé le', 'MAJ', 'Date du call', 'Prospect', 'Type', 'Événement', 'Closer', 'État iClosed', 'Présence', 'Résultat', 'Qualifié /10', 'Température', 'Offre', 'Prix proposé', 'Paiement', 'Encaissé', 'Objection', 'Pourquoi pas signé', 'Prochaine étape', 'Relance le', 'Enregistrement', 'Notes du call', 'Rempli le', 'Confirmation envoyée', 'Réponse confirmation'];
+const CALLS_KEYS = ['id', 'lead_id', 'created', 'updated', 'call_at', 'name', 'kind', 'event', 'closer', 'ic_state', 'show', 'result', 'score', 'temp', 'offer', 'price', 'payment', 'paid', 'objection', 'reason', 'next_step', 'next_at', 'recording', 'notes', 'filled_at', 'conf_sent', 'conf_reply'];
+// Réservations iClosed qui sont des séances de clients (pas des calls de vente)
+const IC_CLIENT = /accompagnement|1\s*to\s*1|one\s*to\s*one/i;
 
 // Sheet des inscriptions au live (rempli par le webhook de la LP live-leads-and-business)
 const INSCRITS_ID = '1G-v7_Ow_jLJtu1lVMRCpsPdecrBVTBabMA71lqVPA-8';
@@ -60,12 +75,15 @@ function route(p) {
   if (p.what === 'all') return all();
   if (p.what === 'upsert') return upsert(p);
   if (p.what === 'delete') return remove(p);
+  if (p.what === 'call_upsert') return callUpsert(p);
+  if (p.what === 'call_delete') return callDelete(p);
   if (p.what === 'inscrits') return inscrits();
   if (p.what === 'sync') { try { return icSync(p.force === '1' || p.force === true); } catch (e) { return { ok: false, error: String(e) }; } }
   if (p.what === 'ic_setkey') return icSetKey(p);
   if (p.what === 'tg_setup') return tgSetup(p);
   if (p.what === 'settings_set') return settingsSet(p);
   if (p.what === 'cron') return cron(p);
+  if (p.what === 'brief_preview') { const d = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd'); return { ok: true, brief: brief(d), soir: soir(d) }; } // lecture seule, rien n'est envoyé
   if (!p.what) return { ok: true, pong: true, v: 1 };
   return { ok: false, error: 'unknown what' };
 }
@@ -74,6 +92,7 @@ function route(p) {
 function setup() {
   const ss = book();
   tab(ss, LEADS_TAB, LEADS_HDR);
+  tab(ss, CALLS_TAB, CALLS_HDR);
   const def = ss.getSheetByName('Feuille 1') || ss.getSheetByName('Sheet1');
   if (def && ss.getSheets().length > 1) ss.deleteSheet(def);
   let inscritsOk = false;
@@ -89,15 +108,19 @@ function book() {
   return ss;
 }
 
+// largeur des colonnes de texte long, par onglet
+const WIDE = { need: 280, notes: 320, reason: 300, next_step: 220, ic_info: 260 };
 function tab(ss, name, hdr) {
+  const keys = name === CALLS_TAB ? CALLS_KEYS : LEADS_KEYS;
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
+    if (sh.getMaxColumns() < hdr.length) sh.insertColumnsAfter(sh.getMaxColumns(), hdr.length - sh.getMaxColumns());
     sh.getRange(1, 1, 1, hdr.length).setValues([hdr]).setFontWeight('bold').setBackground('#a6ff4d').setFontColor('#060a04');
     sh.setFrozenRows(1);
-    sh.setColumnWidth(LEADS_KEYS.indexOf('need') + 1, 280);
-    sh.setColumnWidth(LEADS_KEYS.indexOf('notes') + 1, 320);
+    Object.keys(WIDE).forEach(k => { const i = keys.indexOf(k); if (i >= 0 && k !== 'ic_info') sh.setColumnWidth(i + 1, WIDE[k]); });
   } else if (sh.getLastColumn() < hdr.length) {
+    if (sh.getMaxColumns() < hdr.length) sh.insertColumnsAfter(sh.getMaxColumns(), hdr.length - sh.getMaxColumns());
     sh.getRange(1, 1, 1, hdr.length).setValues([hdr]).setFontWeight('bold');
   }
   return sh;
@@ -123,8 +146,16 @@ function rows(sh, keys) {
 }
 
 function all() {
-  const sh = tab(book(), LEADS_TAB, LEADS_HDR);
-  return { ok: true, now: stamp(), leads: rows(sh, LEADS_KEYS), ic_sync: P.getProperty('IC_LAST') || '', settings: settingsGet(), tg: !!P.getProperty('TG_TOKEN'), ic_due: Date.now() - Number(P.getProperty('IC_LAST_MS') || 0) > IC_EVERY_MS && !!P.getProperty('ICLOSED_KEY') };
+  const ss = book();
+  const sh = tab(ss, LEADS_TAB, LEADS_HDR);
+  const cs = tab(ss, CALLS_TAB, CALLS_HDR);
+  return { ok: true, now: stamp(), leads: rows(sh, LEADS_KEYS), calls: rows(cs, CALLS_KEYS), ic_sync: P.getProperty('IC_LAST') || '', settings: settingsGet(), tg: !!P.getProperty('TG_TOKEN'), ic_due: Date.now() - Number(P.getProperty('IC_LAST_MS') || 0) > IC_EVERY_MS && !!P.getProperty('ICLOSED_KEY') };
+}
+
+function rowObj(sh, keys, r) {
+  const v = sh.getRange(r, 1, 1, keys.length).getValues()[0];
+  const o = {}; keys.forEach((k, i) => { o[k] = cell(v[i]); });
+  return o;
 }
 
 function findRow(sh, id) {
@@ -136,43 +167,77 @@ function findRow(sh, id) {
 }
 
 // ---------- écriture ----------
+const NUM_KEYS = ['score', 'price', 'paid', 'touches'];
 function clean(k, v) {
   if (v === null || v === undefined) return '';
-  if (k === 'score' || k === 'price' || k === 'paid' || k === 'touches') { const n = Number(v); return isNaN(n) || v === '' ? '' : n; }
+  if (NUM_KEYS.indexOf(k) >= 0) { const n = Number(v); return isNaN(n) || v === '' ? '' : n; }
   return String(v);
 }
 
+// Écrit un objet dans un onglet : mise à jour (seules les clés envoyées, jamais id ni created) si l'id existe,
+// sinon création (sauf create === false). À appeler sous verrou.
+function writeRow(sh, keys, obj, prefix, create) {
+  const now = stamp();
+  const r = obj.id ? findRow(sh, obj.id) : 0;
+  if (r) {
+    keys.forEach((k, i) => {
+      if (k === 'id' || k === 'created' || k === 'updated') return;
+      if (!Object.prototype.hasOwnProperty.call(obj, k)) return;
+      sh.getRange(r, i + 1).setNumberFormat('@').setValue(clean(k, obj[k]));
+    });
+    sh.getRange(r, keys.indexOf('updated') + 1).setNumberFormat('@').setValue(now);
+    return { ok: true, id: String(obj.id), updated: now };
+  }
+  if (create === false) return { ok: false, error: 'introuvable', id: String(obj.id || '') };
+  const id = obj.id ? String(obj.id) : prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const row = keys.map(k => {
+    if (k === 'id') return id;
+    if (k === 'created') return obj.created ? String(obj.created) : now;
+    if (k === 'updated') return now;
+    return clean(k, obj[k]);
+  });
+  const at = sh.getLastRow() + 1;
+  sh.getRange(at, 1, 1, row.length).setNumberFormat('@').setValues([row]);
+  return { ok: true, id, created: row[keys.indexOf('created')], updated: now };
+}
+
 function upsert(p) {
-  const lead = p.lead || {};
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
-    const sh = tab(book(), LEADS_TAB, LEADS_HDR);
-    const now = stamp();
-    let r = lead.id ? findRow(sh, lead.id) : 0;
-    if (r) {
-      // mise à jour : seules les clés envoyées sont écrites, jamais id ni created
-      LEADS_KEYS.forEach((k, i) => {
-        if (k === 'id' || k === 'created' || k === 'updated') return;
-        if (!Object.prototype.hasOwnProperty.call(lead, k)) return;
-        sh.getRange(r, i + 1).setNumberFormat('@').setValue(clean(k, lead[k]));
-      });
-      sh.getRange(r, LEADS_KEYS.indexOf('updated') + 1).setNumberFormat('@').setValue(now);
-      return { ok: true, id: String(lead.id), updated: now };
-    }
-    const id = lead.id ? String(lead.id) : 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const row = LEADS_KEYS.map(k => {
-      if (k === 'id') return id;
-      if (k === 'created') return lead.created ? String(lead.created) : now;
-      if (k === 'updated') return now;
-      return clean(k, lead[k]);
-    });
-    sh.appendRow(row);
-    sh.getRange(sh.getLastRow(), 1, 1, row.length).setNumberFormat('@');
-    return { ok: true, id, created: row[1], updated: now };
+    return writeRow(tab(book(), LEADS_TAB, LEADS_HDR), LEADS_KEYS, p.lead || {}, 'l');
   } finally {
     lock.releaseLock();
   }
+}
+
+// résultat d'un call : la ligne du call + les changements de la fiche lead, sous le même verrou
+function callUpsert(p) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  let res = { ok: true }, sale = null;
+  try {
+    const ss = book();
+    if (p.call) {
+      const cs = tab(ss, CALLS_TAB, CALLS_HDR);
+      const r = p.call.id ? findRow(cs, p.call.id) : 0;
+      const before = r ? rowObj(cs, CALLS_KEYS, r) : {};
+      res.call = writeRow(cs, CALLS_KEYS, p.call, 'c', p.create === true); // pas de ligne à moitié vide si l'id est inconnu
+      if (res.call.ok && p.call.result === 'vendu' && before.result !== 'vendu') sale = Object.assign({}, before, p.call);
+    }
+    if (p.lead && p.lead.id) res.lead = writeRow(tab(ss, LEADS_TAB, LEADS_HDR), LEADS_KEYS, p.lead, 'l', false);
+    if (res.call) res.id = res.call.id;
+    if (res.call && !res.call.ok) res = Object.assign(res, { ok: false, error: 'call introuvable' });
+  } finally {
+    lock.releaseLock();
+  }
+  if (sale) {
+    try {
+      tg('💰 <b>Vente Lucas</b>\n' + h(sale.name) + (Number(sale.price) ? ' · ' + Math.round(Number(sale.price)).toLocaleString('fr-FR') + ' €' : '') +
+        (sale.offer ? '\n' + h(sale.offer) : '') + (sale.payment ? ' · ' + h(sale.payment) : '') + '\n\n<a href="' + CONSOLE_URL + '#chiffres">Ouvrir la console</a>');
+    } catch (e) { /* la vente est enregistrée même si Telegram ne répond pas */ }
+  }
+  return res;
 }
 
 function remove(p) {
@@ -182,6 +247,20 @@ function remove(p) {
     const sh = tab(book(), LEADS_TAB, LEADS_HDR);
     const r = findRow(sh, p.id);
     if (!r) return { ok: false, error: 'lead introuvable' };
+    sh.deleteRow(r);
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function callDelete(p) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sh = tab(book(), CALLS_TAB, CALLS_HDR);
+    const r = findRow(sh, p.id);
+    if (!r) return { ok: true, missing: true };
     sh.deleteRow(r);
     return { ok: true };
   } finally {
@@ -253,11 +332,14 @@ function icLocal(utc) { return utc ? Utilities.formatDate(new Date(utc), TZ, "yy
 function icCancelled(c) { return !!(c.cancelReason || c.cancelledBy); }
 
 // Résume toutes les réservations d'une personne en une fiche
+function icEventText(c) { return ((c.event || {}).name || '') + ' ' + ((c.event || {}).internalDescription || ''); }
 function icPerson(calls) {
   calls.sort((a, b) => String(a.dateTimeUTC).localeCompare(String(b.dateTimeUTC)));
   const now = Date.now();
-  const active = calls.filter(c => !icCancelled(c));
-  const last = active.length ? active[active.length - 1] : calls[calls.length - 1];
+  const sales = calls.filter(c => !IC_CLIENT.test(icEventText(c)));
+  const base = sales.length ? sales : calls; // une séance client ne change ni le statut ni le prochain call
+  const active = base.filter(c => !icCancelled(c));
+  const last = active.length ? active[active.length - 1] : base[base.length - 1];
   const first = calls[0];
   const ans = {};
   calls.forEach(c => (c.secondaryAnswers || []).concat(c.questions || []).forEach(q => { const a = icAnswer(q && q.answer); if (q && q.statement && a.replace(/[\s'".,-]/g, '').length) ans[q.statement.trim()] = a; }));
@@ -309,6 +391,7 @@ function icPerson(calls) {
   const price = deals.reduce((s, d) => s + (Number(d.value) || 0), 0);
   const soldAt = deals.length ? Utilities.formatDate(new Date(deals[deals.length - 1].time), TZ, 'yyyy-MM-dd') : '';
   const notes = deals.length ? 'Vendu : ' + deals.map(d => ((d.product || {}).name || 'offre') + ' ' + d.value + ' €').join(', ') : '';
+  const offer = deals.map(d => (d.product || {}).name || '').filter(Boolean).join(', ');
 
   return {
     ic_contact: String(last.contactId || first.contactId || ''),
@@ -317,7 +400,7 @@ function icPerson(calls) {
     phone: last.phoneNumber || (last.contact || {}).phoneNumber || pick(/Phone Number/i) || '',
     source, call_at: icLocal(last.dateTimeUTC), status, score: '', need,
     objection: obj ? (IC_OBJ[obj] !== undefined ? IC_OBJ[obj] : obj.toLowerCase().replace(/_/g, ' ')) : '',
-    price: price || '', sold_at: soldAt, notes,
+    price: price || '', sold_at: soldAt, notes, offer,
     created: icLocal(first.createdAt || first.dateTimeUTC).replace(/$/, ':00'),
     ic_info: info, ic_link: !icCancelled(last) && lastTime > now ? (last.locationLinkInvitee || last.locationLink || '') : '', ic_event: (last.event || {}).name || '', ic_result: result,
     next_at: status === 'followup' ? Utilities.formatDate(new Date(lastTime + 86400000), TZ, 'yyyy-MM-dd') : status === 'noshow' || status === 'a_appeler' ? Utilities.formatDate(new Date(Math.max(lastTime, now)), TZ, 'yyyy-MM-dd') : '',
@@ -360,6 +443,7 @@ function icSync(force) {
     let created = 0, updated = 0;
     const touched = new Set();
     const fresh = [];
+    const leadOf = {}; // groupe iClosed -> id de la fiche lead
     Object.keys(groups).forEach(g => {
       const f = icPerson(groups[g]);
       let i = byContact[f.ic_contact];
@@ -367,18 +451,21 @@ function icSync(force) {
       if (i === undefined && icDigits(f.phone)) i = byPhone[icDigits(f.phone)];
       if (i === undefined) {
         created++;
-        fresh.push(LEADS_KEYS.map(k => k === 'id' ? 'ic' + (f.ic_contact || Utilities.getUuid().slice(0, 8)) : k === 'created' ? f.created : k === 'updated' ? stampNow : k === 'ic_status' ? f.status : clean(k, f[k])));
+        const nid = 'ic' + (f.ic_contact || Utilities.getUuid().slice(0, 8));
+        leadOf[g] = nid;
+        fresh.push(LEADS_KEYS.map(k => k === 'id' ? nid : k === 'created' ? f.created : k === 'updated' ? stampNow : k === 'ic_status' ? f.status : clean(k, f[k])));
         return;
       }
+      leadOf[g] = String(data[i][col('id')]);
       const r = data[i];
       let changed = false;
       const set = (k, v) => { const c = col(k); if (String(r[c]) !== String(v)) { r[c] = v; changed = true; } };
       const prevCall = String(r[col('call_at')] || '').slice(0, 16);
       ALWAYS.forEach(k => { if (k === 'call_at' && r[col('call_at')] && String(r[col('call_at')]).slice(0, 16) > f.call_at) return; set(k, clean(k, f[k])); });
-      ['name', 'email', 'phone', 'source', 'score', 'need', 'objection', 'price', 'sold_at', 'notes'].forEach(k => { if (r[col(k)] === '' && f[k] !== '') set(k, clean(k, f[k])); });
+      ['name', 'email', 'phone', 'source', 'score', 'need', 'objection', 'price', 'sold_at', 'notes', 'offer'].forEach(k => { if (r[col(k)] === '' && f[k] !== '') set(k, clean(k, f[k])); });
       const cur = String(r[col('status')] || ''), auto = String(r[col('ic_status')] || '');
       const newBooking = f.status === 'booke' && f.call_at > prevCall && f.call_at > icLocal(new Date().toISOString());
-      if (!cur || cur === auto || newBooking) {
+      if (!cur || cur === auto || (newBooking && cur !== 'vendu' && cur !== 'ecarte')) {
         set('status', f.status);
         if (newBooking) { set('confirmed', ''); }
         if (f.next_at && r[col('next_at')] === '' && f.status !== auto) { set('next_at', f.next_at); set('next_action', f.next_action); }
@@ -394,13 +481,84 @@ function icSync(force) {
       const start = sh.getLastRow() + 1;
       sh.getRange(start, 1, fresh.length, LEADS_KEYS.length).setNumberFormat('@').setValues(fresh);
     }
+    let callsSync;
+    try { callsSync = icCallsSync(groups, leadOf, stampNow); } catch (e) { callsSync = { ok: false, error: String(e && e.message || e) }; }
     P.setProperty('IC_LAST_MS', String(Date.now()));
     P.setProperty('IC_LAST', stampNow);
     icWatch(calls);
-    return { ok: true, calls: calls.length, people: Object.keys(groups).length, created, updated };
+    return { ok: true, calls: calls.length, people: Object.keys(groups).length, created, updated, calls_sync: callsSync };
   } finally {
     lock.releaseLock();
   }
+}
+
+// Champs d'un call tirés d'iClosed (résultat seulement si Lucas l'a saisi dans iClosed)
+function icCallFields(c, kind) {
+  const t = (c.task || [])[0] || {};
+  const cancelled = icCancelled(c);
+  const r = t.noSaleReason;
+  let show = '', result = '';
+  if (cancelled) show = 'annule';
+  else if (t.outcome === 'WON') { show = 'present'; result = 'vendu'; }
+  else if (t.outcome === 'NO_SALE') {
+    if (r === 'NO_SHOW') show = 'noshow';
+    else if (r === 'CONTACT_CANCELLED' || r === 'ADMIN_CANCELLED') show = 'annule';
+    else { show = 'present'; result = r === 'FOLLOW_UP_SCHEDULE' ? 'followup' : r === 'UNQUALIFIED' ? 'non_qualifie' : 'perdu'; }
+  }
+  const won = (c.deals || []).filter(d => d.transactionType === 'WON');
+  const obj = t.objection && t.objection !== 'NO_OBJECTION' ? (IC_OBJ[t.objection] !== undefined ? IC_OBJ[t.objection] : String(t.objection).toLowerCase().replace(/_/g, ' ')) : '';
+  const note = icText(t.notes);
+  return {
+    call_at: icLocal(c.dateTimeUTC), name: String(c.inviteeName || '').trim(), kind, event: String((c.event || {}).name || '').trim(),
+    closer: String((c.user || {}).firstName || '').trim(), ic_state: cancelled ? 'annule' : new Date(c.dateTimeUTC).getTime() > Date.now() ? 'a_venir' : 'passe',
+    show, result, objection: obj,
+    notes: cancelled && c.cancelReason ? 'Annulé : ' + String(c.cancelReason).trim() + (note ? '\n' + note : '') : note,
+    price: won.reduce((s, d) => s + (Number(d.value) || 0), 0) || '', offer: won.map(d => (d.product || {}).name || '').filter(Boolean).join(', '),
+  };
+}
+
+// Onglet Calls : crée les réservations nouvelles, rafraîchit date / état iClosed, et ne remplit
+// les champs de résultat que s'ils sont vides (ce qui est saisi dans la console n'est jamais écrasé)
+function icCallsSync(groups, leadOf, stampNow) {
+  const sh = tab(book(), CALLS_TAB, CALLS_HDR);
+  const last = sh.getLastRow();
+  const data = last >= 2 ? sh.getRange(2, 1, last - 1, CALLS_KEYS.length).getValues() : [];
+  const col = k => CALLS_KEYS.indexOf(k);
+  const byId = {};
+  data.forEach((r, i) => { if (r[0] !== '') byId[String(r[0])] = i; });
+  const ALWAYS = ['call_at', 'event', 'closer', 'ic_state'];
+  const FILL = ['lead_id', 'name', 'kind', 'show', 'result', 'objection', 'notes', 'price', 'offer'];
+  const touched = new Set(), fresh = [];
+  let created = 0, updated = 0;
+  Object.keys(groups).forEach(g => {
+    const list = groups[g].slice().sort((a, b) => String(a.dateTimeUTC).localeCompare(String(b.dateTimeUTC)));
+    let sales = false;
+    list.forEach(c => {
+      const ev = ((c.event || {}).name || '') + ' ' + ((c.event || {}).internalDescription || '');
+      const kind = IC_CLIENT.test(ev) ? 'client' : sales ? 'suivi' : 'r1';
+      if (kind !== 'client' && !icCancelled(c)) sales = true;
+      const f = icCallFields(c, kind);
+      f.lead_id = leadOf[g] || '';
+      const id = 'icc' + c.id;
+      const i = byId[id];
+      if (i === undefined) {
+        created++;
+        fresh.push(CALLS_KEYS.map(k => k === 'id' ? id : k === 'created' ? icLocal(c.createdAt || c.dateTimeUTC) : k === 'updated' ? stampNow : clean(k, f[k])));
+        byId[id] = -1;
+        return;
+      }
+      if (i < 0) return;
+      const r = data[i];
+      let changed = false;
+      const set = (k, v) => { const ci = col(k); if (String(r[ci]) !== String(v)) { r[ci] = v; changed = true; } };
+      ALWAYS.forEach(k => set(k, clean(k, f[k])));
+      FILL.forEach(k => { if (String(r[col(k)]) === '' && String(f[k]) !== '') set(k, clean(k, f[k])); });
+      if (changed) { r[col('updated')] = stampNow; updated++; touched.add(i); }
+    });
+  });
+  [...touched].forEach(i => sh.getRange(i + 2, 1, 1, CALLS_KEYS.length).setNumberFormat('@').setValues([data[i].map(v => v instanceof Date ? cell(v) : v)]));
+  if (fresh.length) sh.getRange(sh.getLastRow() + 1, 1, fresh.length, CALLS_KEYS.length).setNumberFormat('@').setValues(fresh);
+  return { ok: true, created, updated };
 }
 
 // ---------- réglages partagés (objectifs + messages WhatsApp) ----------
@@ -476,48 +634,79 @@ function cron(p) {
 }
 
 function leadsNow() { return rows(tab(book(), LEADS_TAB, LEADS_HDR), LEADS_KEYS); }
+function callsNow() { return rows(tab(book(), CALLS_TAB, CALLS_HDR), CALLS_KEYS); }
 function addDaysIso(iso, n) { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return Utilities.formatDate(d, TZ, 'yyyy-MM-dd'); }
-const OPEN_ST = ['a_appeler', 'booke', 'fait', 'followup', 'noshow'];
+function nowLocal() { return Utilities.formatDate(new Date(), TZ, "yyyy-MM-dd'T'HH:mm"); }
+const OPEN_ST = ['a_appeler', 'booke', 'fait', 'followup', 'noshow']; // « ecarte » (doublon, test) : hors stats et hors relances
+// un call ajouté à la main et pas rempli est un doublon si iClosed a une réservation le même jour pour ce lead
+function dedupeCalls(C) {
+  const icDays = {};
+  C.forEach(c => { if (String(c.id).indexOf('icc') === 0 && !cancelledCall(c)) icDays[c.lead_id + '|' + String(c.call_at).slice(0, 10)] = true; });
+  return C.filter(c => String(c.id).indexOf('icc') === 0 || c.show || !icDays[c.lead_id + '|' + String(c.call_at).slice(0, 10)]);
+}
+function cancelledCall(c) { return c.ic_state === 'annule' || c.show === 'annule' || c.show === 'reporte'; }
+// calls de vente passés sans présence renseignée (30 derniers jours)
+function callsToFill(calls, today) {
+  const now = nowLocal(), lim = addDaysIso(today, -30);
+  return calls.filter(c => c.kind !== 'client' && !cancelledCall(c) && !c.show && String(c.call_at).slice(0, 16) < now && String(c.call_at).slice(0, 10) >= lim);
+}
 
-function monthStats(leads, m) {
-  const calls = leads.filter(l => String(l.call_at).slice(0, 7) === m && String(l.call_at).slice(0, 10) <= Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd'));
-  const shows = calls.filter(l => ['fait', 'followup', 'vendu', 'perdu'].includes(l.status)).length;
-  const noshow = calls.filter(l => l.status === 'noshow').length;
+function monthStats(leads, calls, m) {
+  const now = nowLocal();
+  const cm = calls.filter(c => c.kind !== 'client' && !cancelledCall(c) && String(c.call_at).slice(0, 7) === m && String(c.call_at).slice(0, 16) < now);
+  const shows = cm.filter(c => c.show === 'present').length;
+  const noshow = cm.filter(c => c.show === 'noshow').length;
   const ventes = leads.filter(l => l.status === 'vendu' && String(l.sold_at).slice(0, 7) === m);
   const ca = ventes.reduce((a, l) => a + (Number(l.price) || 0), 0);
   const cash = ventes.reduce((a, l) => a + (Number(l.paid) || 0), 0);
-  return { calls: calls.length, shows, noshow, ventes: ventes.length, ca, cash };
+  return { calls: cm.length, shows, noshow, ventes: ventes.length, ca, cash };
 }
 
 function brief(today) {
   const L = leadsNow();
+  const ecartes = new Set(L.filter(l => l.status === 'ecarte').map(l => String(l.id)));
+  const C = dedupeCalls(callsNow()).filter(c => !ecartes.has(String(c.lead_id)));
   const S = settingsGet();
+  const byId = {}; L.forEach(l => byId[String(l.id)] = l);
   const tomorrow = addDaysIso(today, 1);
   const eur = n => Math.round(n).toLocaleString('fr-FR') + ' €';
-  const callsToday = L.filter(l => String(l.call_at).slice(0, 10) === today && l.status !== 'perdu').sort((a, b) => String(a.call_at).localeCompare(String(b.call_at)));
-  const toFill = L.filter(l => l.call_at && String(l.call_at).slice(0, 10) < today && String(l.call_at).slice(0, 10) >= addDaysIso(today, -30) && ['booke', 'a_appeler'].includes(l.status));
+  const hh = c => String(c.call_at).slice(11, 16).replace(':', 'h');
+  const callsToday = C.filter(c => String(c.call_at).slice(0, 10) === today && !cancelledCall(c)).sort((a, b) => String(a.call_at).localeCompare(String(b.call_at)));
+  const toFill = callsToFill(C, today);
   const late = L.filter(l => l.next_at && OPEN_ST.includes(l.status) && String(l.next_at).slice(0, 10) <= today);
-  const tom = L.filter(l => String(l.call_at).slice(0, 10) === tomorrow && l.status === 'booke');
+  const tom = C.filter(c => String(c.call_at).slice(0, 10) === tomorrow && !cancelledCall(c) && c.kind !== 'client' && c.conf_reply !== 'ok');
+  const fu = L.filter(l => l.status === 'followup');
+  const fuVal = fu.reduce((a, l) => a + (Number(l.price) || 0), 0);
   const m = today.slice(0, 7);
-  const st = monthStats(L, m);
+  const st = monthStats(L, C, m);
   const obj = Number(S.objectif_ca) || 0;
   const day = Number(today.slice(8, 10)), dim = new Date(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 0).getDate();
   const proj = day > 1 ? st.ca / (day - 1) * dim : 0;
   let t = '☀️ <b>Lucas · brief du ' + Utilities.formatDate(new Date(), TZ, 'd/MM') + '</b>\n\n';
-  t += '📞 <b>Calls aujourd\'hui : ' + callsToday.length + '</b>\n' + (callsToday.length ? callsToday.map(l => '• ' + String(l.call_at).slice(11, 16).replace(':', 'h') + ' ' + h(l.name) + (l.confirmed ? ' ✅' : ' (pas confirmé)')).join('\n') + '\n' : '');
+  const conf = c => c.conf_reply === 'ok' ? ' ✅' : c.conf_reply === 'decale' ? ' (veut décaler)' : c.conf_sent ? ' (message envoyé, pas de réponse)' : ' (pas confirmé)';
+  t += '📞 <b>Calls aujourd\'hui : ' + callsToday.length + '</b>\n' + (callsToday.length ? callsToday.map(c => '• ' + hh(c) + ' ' + h(c.name) + (c.kind === 'client' ? ' (séance client)' : conf(c))).join('\n') + '\n' : '');
   if (tom.length) t += '🗓 Demain : ' + tom.length + ' call' + (tom.length > 1 ? 's' : '') + ' à confirmer\n';
-  t += '\n🔁 <b>Relances à faire : ' + late.length + '</b>\n' + late.slice(0, 8).map(l => '• ' + h(l.name) + ' · ' + h(l.next_action || 'relance')).join('\n') + (late.length > 8 ? '\n• +' + (late.length - 8) + ' autres' : '') + '\n';
+  t += '\n🔁 <b>Relances à faire : ' + late.length + '</b>\n' + (late.length ? late.slice(0, 8).map(l => '• ' + h(l.name) + ' · ' + h(l.next_action || 'relance')).join('\n') + (late.length > 8 ? '\n• +' + (late.length - 8) + ' autres' : '') + '\n' : '');
+  if (fu.length) t += '\n🔥 Follow-ups ouverts : ' + fu.length + (fuVal ? ' · ' + eur(fuVal) + ' sur la table' : '') + '\n';
   if (toFill.length) t += '\n⚠️ <b>' + toFill.length + ' call' + (toFill.length > 1 ? 's' : '') + ' sans résultat</b> (à remplir)\n';
-  t += '\n📊 <b>Mois en cours</b>\nCalls passés ' + st.calls + ' · show-up ' + (st.shows + st.noshow ? Math.round(100 * st.shows / (st.shows + st.noshow)) + ' %' : '–') + ' · ventes ' + st.ventes + ' · closing ' + (st.shows ? Math.round(100 * st.ventes / st.shows) + ' %' : '–') + '\nCA signé ' + eur(st.ca) + (obj ? ' / ' + eur(obj) + ' (projection ' + eur(proj) + ')' : '') + '\n';
+  t += '\n📊 <b>Mois en cours</b>\nCalls passés ' + st.calls + ' · show-up ' + (st.shows + st.noshow ? Math.round(100 * st.shows / (st.shows + st.noshow)) + ' %' : '–') + ' · ventes ' + st.ventes + ' · closing ' + (st.shows ? Math.round(100 * st.ventes / st.shows) + ' %' : '–') + '\nCA signé ' + eur(st.ca) + (obj ? ' / ' + eur(obj) + ' (projection ' + eur(proj) + ')' : '') + ' · encaissé ' + eur(st.cash) + '\n';
+  const lastSale = L.filter(l => l.status === 'vendu' && l.sold_at).map(l => String(l.sold_at).slice(0, 10)).sort().pop();
+  if (lastSale) {
+    const n = Math.round((new Date(today + 'T12:00:00') - new Date(lastSale + 'T12:00:00')) / 86400000);
+    // au-delà de 90 jours, les ventes n'étaient pas encore suivies dans la console : pas d'alerte
+    if (n >= 4 && n <= 90) t += '\n' + (n >= 7 ? '🔴' : '🟠') + ' ' + n + ' jours sans vente (dernière le ' + lastSale.slice(8, 10) + '/' + lastSale.slice(5, 7) + ')\n';
+  }
   t += '\n<a href="' + CONSOLE_URL + '">Ouvrir la console</a>';
   return t;
 }
 
 function soir(today) {
-  const L = leadsNow();
-  const miss = L.filter(l => String(l.call_at).slice(0, 10) === today && ['booke', 'a_appeler'].includes(l.status));
+  const now = nowLocal();
+  const ecartes = new Set(leadsNow().filter(l => l.status === 'ecarte').map(l => String(l.id)));
+  const miss = dedupeCalls(callsNow()).filter(c => !ecartes.has(String(c.lead_id))).filter(c => String(c.call_at).slice(0, 10) === today && String(c.call_at).slice(0, 16) < now && c.kind !== 'client' && !cancelledCall(c) && !c.show)
+    .sort((a, b) => String(a.call_at).localeCompare(String(b.call_at)));
   if (!miss.length) return '';
-  return '🌙 <b>Lucas · ' + miss.length + ' call' + (miss.length > 1 ? 's' : '') + ' du jour sans résultat</b>\n' + miss.map(l => '• ' + String(l.call_at).slice(11, 16).replace(':', 'h') + ' ' + h(l.name)).join('\n') + '\n\nVenu ? Vendu ? Follow-up ? 30 secondes dans la console.\n<a href="' + CONSOLE_URL + '">Remplir</a>';
+  return '🌙 <b>Lucas · ' + miss.length + ' call' + (miss.length > 1 ? 's' : '') + ' du jour sans résultat</b>\n' + miss.map(c => '• ' + String(c.call_at).slice(11, 16).replace(':', 'h') + ' ' + h(c.name)).join('\n') + '\n\nVenu ? Vendu ? Follow-up ? Objection ? 1 minute dans la console.\n<a href="' + CONSOLE_URL + '#today">Remplir</a>';
 }
 
 function out(o) {

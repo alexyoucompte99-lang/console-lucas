@@ -237,6 +237,115 @@ input[type=date].inp,input[type=datetime-local].inp{min-height:46px;-webkit-appe
 .tr2{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--bord-2);font-size:14px}.tr2:first-of-type{border-top:0}
 .sale{cursor:pointer}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- refonte 17/09 : périodes, fiche résultat, suivi des calls, tris ---------- */
+.st.s-ecarte{background:transparent;color:var(--muet-2);border-style:dashed}
+.per{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+.per .lab{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muet-2);margin-right:2px}
+.per button,.per select{padding:7px 11px;border-radius:999px;background:var(--panneau);border:1px solid var(--bord-2);font-weight:600;font-size:12.5px;color:var(--muet);line-height:1.2;min-height:32px}
+.per button.on,.per select.on{background:var(--vert);color:var(--blanc);border-color:var(--vert)}
+.per select{appearance:none;-webkit-appearance:none;padding-right:28px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23565c4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+.per select.on{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fffdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px}
+.toolbar .inp{flex:1 1 150px;width:auto;padding:9px 12px;font-size:14.5px;min-height:40px}
+.toolbar select.inp{padding-right:34px;background-position:right 10px center}
+.toolbar .grow{flex:2 1 220px}
+.subtabs{display:flex;gap:6px;margin-bottom:12px}
+.subtabs button{padding:8px 14px;border-radius:10px;font-weight:600;font-size:13.5px;color:var(--muet);background:var(--panneau);border:1px solid var(--bord-2)}
+.subtabs button.on{background:var(--encre);color:var(--blanc);border-color:var(--encre)}
+.kpi.click{cursor:pointer;transition:border-color .2s}
+.kpi.click:hover{border-color:var(--vert-bord)}
+.delta{font-family:var(--mono);font-size:11px;margin-left:4px;white-space:nowrap}
+.delta.up{color:var(--vert)}.delta.down{color:var(--rouge)}.delta.eq{color:var(--muet-2)}
+.kpi .v.m{color:var(--muet-2)}
+.goulot .gbtn{margin-top:8px}
+.plan{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border-radius:14px;margin:0 0 6px;border:1px dashed var(--bord);background:var(--panneau)}
+.plan b{font-size:14px}.plan span{font-size:13.5px;color:var(--muet)}.plan .hint{font-size:12px}
+.plan.row2{flex-direction:row;justify-content:space-between;align-items:center;gap:10px}
+.sec .btn{white-space:nowrap}
+.toast{bottom:calc(88px + env(safe-area-inset-bottom))}
+/* fiche résultat */
+.rn-box.form{max-width:600px}
+.form .name{font-family:var(--display);font-size:25px;line-height:1.05;margin-top:2px}
+.form .lbl small{letter-spacing:.04em;text-transform:none;font-family:var(--body);font-size:11.5px;color:var(--muet-2);margin-left:6px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:9px 13px;border-radius:12px;background:var(--fond);border:1px solid var(--bord-2);font-weight:600;font-size:14px;color:var(--muet);min-height:42px;line-height:1.2}
+.seg button:hover{border-color:var(--vert-bord)}
+.seg button.on{background:var(--vert);color:var(--blanc);border-color:var(--vert)}
+.seg button.on.o{background:var(--or);border-color:var(--or)}
+.seg button.on.r{background:var(--rouge);border-color:var(--rouge);color:#fff}
+.seg button.on.m{background:var(--muet);border-color:var(--muet)}
+.seg.num button{width:40px;padding:0;font-family:var(--mono);font-size:13.5px}
+.seg.small button{min-height:36px;padding:7px 11px;font-size:13px}
+.zone{border-top:1px dashed var(--bord-2);margin-top:14px;padding-top:2px}
+.zone.v{border-color:var(--vert-bord)}.zone.o{border-color:rgba(200,140,20,.35)}
+.chk{display:flex;gap:9px;align-items:center;font-size:14px;margin-top:12px;color:var(--creme);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--vert)}
+.draft{background:var(--or-dim);color:var(--or);border-radius:10px;padding:7px 10px;margin-top:10px;font-size:13px}
+.draft a{color:var(--or);margin-left:6px}
+.linkbtn{color:var(--muet-2);font-size:13px;text-decoration:underline;margin-top:12px;display:inline-block}
+.err-inline{color:var(--rouge);font-size:12.5px;margin-top:6px}
+/* suivi des calls */
+.callc{padding:12px 14px}
+.callc .top2{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.callc .when{font-family:var(--mono);font-size:11px;color:var(--muet-2);letter-spacing:.04em;margin-bottom:2px}
+.callc .name{font-family:var(--display);font-size:21px;line-height:1.05;cursor:pointer}
+.recap{margin-top:8px;font-size:13.5px;color:var(--muet);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.todo-line{margin-top:9px;font-size:13.5px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;color:var(--creme)}
+.todo-line b{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--vert);flex:none}
+.todo-line.late b,.todo-line.late span{color:var(--rouge)}
+.todo-line.warn b{color:var(--or)}
+.todo-line.done b{color:var(--muet-2)}.todo-line.done span{color:var(--muet)}
+.conf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.conf .hint{font-size:12px}
+.conf button{padding:5px 10px;border-radius:9px;font-size:12.5px;font-weight:600;border:1px solid var(--bord-2);background:var(--fond);color:var(--muet)}
+.conf button.on{background:var(--vert);color:var(--blanc);border-color:var(--vert)}
+.conf button.on.o{background:var(--or);border-color:var(--or)}
+.conf button.on.m{background:var(--muet);border-color:var(--muet)}
+.more{display:flex;justify-content:center;margin:6px 0 14px}
+.count-line{font-size:12.5px;color:var(--muet-2);margin:0 2px 8px}
+/* historique des calls dans la fiche lead */
+.hist{display:flex;flex-direction:column}
+.hrow{display:grid;grid-template-columns:150px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--bord-2);font-size:13.5px;cursor:pointer}
+.hrow:first-child{border-top:0}
+.hrow .mono{font-family:var(--mono);font-size:11.5px;color:var(--muet-2)}
+.hrow .ob{color:var(--muet);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.addcall{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.addcall .inp{flex:1 1 200px;width:auto}
+/* chiffres */
+.kpis.k8{grid-template-columns:repeat(4,1fr)}
+@media(max-width:620px){.kpis.k8{grid-template-columns:1fr 1fr}}
+.chain{display:flex;flex-direction:column;gap:2px}
+.chain .fl{display:grid;grid-template-columns:128px 1fr 64px 64px;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+.chain .fb{height:10px;border-radius:9px;background:var(--panneau-2);overflow:hidden}
+.chain .fb i{display:block;height:100%;background:var(--vert);border-radius:9px}
+.chain .fn{font-family:var(--mono);font-size:13px;text-align:right}
+.chain .fr{font-family:var(--mono);font-size:11.5px;color:var(--muet-2);text-align:right}
+@media(max-width:480px){.chain .fl{grid-template-columns:96px 1fr 44px 52px;gap:6px;font-size:13px}}
+.tblw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.gt{display:grid;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--bord-2);font-size:13.5px;min-width:430px}
+.gt:first-child{border-top:0}
+.gt.th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muet-2)}
+.gt.th span{cursor:pointer;user-select:none}
+.gt.tot{font-weight:700;border-top:1px solid var(--bord)}
+.gt.sel{background:var(--vert-dim);border-radius:8px}
+.gt.link{cursor:pointer}.gt.link:hover{background:rgba(31,36,24,.04)}
+.gt span:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.g6{grid-template-columns:1.3fr .7fr .8fr .7fr .8fr 1fr}
+.g5{grid-template-columns:1.5fr .7fr .8fr .8fr 1fr}
+.g4{grid-template-columns:1.6fr .7fr .8fr .8fr}
+@media(max-width:480px){.gt{min-width:0;gap:5px;font-size:12.5px}.gt.th{font-size:9px;letter-spacing:.02em}.g6{grid-template-columns:1.05fr .55fr .8fr .6fr .8fr 1.05fr}.hrow{grid-template-columns:118px 1fr auto;font-size:12.5px}}
+.bars .br{display:grid;grid-template-columns:1fr 110px 40px;gap:10px;align-items:center;padding:6px 0;font-size:13.5px}
+.bars .br i{display:block;height:8px;border-radius:9px;background:var(--or)}
+.bars .br .bw{background:var(--panneau-2);border-radius:9px;overflow:hidden}
+.bars .br b{font-family:var(--mono);font-size:12.5px;text-align:right}
+.card .note{font-size:12px;color:var(--muet-2);margin:-4px 0 8px}
+.pay{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--bord-2)}
+.pay:first-of-type{border-top:0}
+.pay .n{font-family:var(--display);font-size:19px;cursor:pointer}
+.pay .d{font-size:12.5px;color:var(--muet-2)}
+.pay .d.late{color:var(--rouge)}
+.brief{white-space:pre-wrap;font-size:14px;background:var(--fond);border:1px solid var(--bord-2);border-radius:12px;padding:12px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -266,88 +375,188 @@ const CODE = 'lucas26';
 const SOURCES = [['linkedin', 'LinkedIn'], ['setter', 'Setter'], ['iclosed', 'iClosed'], ['live', 'Live'], ['lp', 'LP'], ['insta', 'Insta'], ['reco', 'Recommandation'], ['autre', 'Autre']];
 const STATUS = [
   ['a_appeler', 'À relancer', 's-todo'], ['booke', 'Call booké', 's-booke'], ['followup', 'Follow-up', 's-followup'],
-  ['vendu', 'Vendu', 's-vendu'], ['noshow', 'No-show', 's-noshow'], ['perdu', 'Perdu', 's-perdu'], ['fait', 'Call fait', 's-fait'], ['ancien', 'Ancien', ''],
+  ['vendu', 'Vendu', 's-vendu'], ['noshow', 'No-show', 's-noshow'], ['perdu', 'Perdu', 's-perdu'], ['fait', 'Call fait', 's-fait'], ['ancien', 'Ancien', ''], ['ecarte', 'Écarté', 's-ecarte'],
 ];
 const OPEN = ['a_appeler', 'booke', 'followup', 'noshow', 'fait'];
-const CLOSED = ['vendu', 'perdu', 'ancien'];
 const TABS = [['today', "Aujourd'hui"], ['leads', 'Leads'], ['calls', 'Calls'], ['chiffres', 'Chiffres'], ['inscrits', 'Inscrits live']];
 const STEPS = [2, 3, 7]; // jours entre relance 1 → 2 → 3 → dernière
+// fiche résultat d'un call
+const SHOWS = [['present', 'Présent', ''], ['noshow', 'No-show', 'r'], ['reporte', 'Reporté', 'o'], ['annule', 'Annulé', 'm']];
+const RESULTS = [['vendu', 'Vendu', ''], ['followup', 'Follow-up', 'o'], ['perdu', 'Pas vendu', 'r'], ['non_qualifie', 'Pas qualifié', 'm']];
+const TEMPS = [['chaud', 'Chaud', ''], ['tiede', 'Tiède', 'o'], ['froid', 'Froid', 'm']];
+const PAYMENTS = [['comptant', 'Comptant'], ['2x', '2x'], ['3x', '3x'], ['4x', '4x'], ['autre', 'Autre']];
+// objection -> phrase reprise dans la relance 2 ({objection})
+const OBJECTIONS = [
+  ['Trop cher', "tu hésitais sur l'investissement"],
+  ["Pas l'argent en ce moment", 'le budget était serré pour toi en ce moment'],
+  ['Doit en parler (conjoint / associé)', 'tu voulais en parler avec tes proches'],
+  ['Veut réfléchir', 'tu voulais prendre le temps de réfléchir'],
+  ['Pas le bon moment', "ce n'était pas le bon moment pour toi"],
+  ['Peur de ne pas y arriver', 'tu te demandais si tu allais y arriver'],
+  ["Pas confiance en l'offre", "tu voulais être sûr que l'accompagnement était fait pour toi"],
+  ['Veut le faire seul', 'tu pensais pouvoir avancer seul'],
+  ['Ne voit pas le besoin', "tu n'étais pas sûr d'en avoir besoin maintenant"],
+  ['Autre', ''],
+];
+const DISQUALIF = ['Pas de budget', 'Pas encore freelance', 'Pas la bonne cible', 'Pas motivé', 'Autre'];
 const DEFAULTS = {
-  objectif_ca: '', objectif_ventes: '', signature: 'Alex',
+  objectif_ca: '', objectif_ventes: '', show_vise: '70', closing_vise: '20', signature: 'Alex',
   iclosed: 'https://app.iclosed.io/e/lucasfabre/session-eval-mentorat',
+  offres: 'Mentorat 90 jours',
   tpl: {
     confirm: "Salut {prenom}, c'est {signature} de Leads and Business. Je te confirme ton appel avec Lucas {quand}.\nLe lien : {visio}\nTu es toujours dispo ? Réponds-moi juste ici pour valider.",
-    followup: "Salut {prenom}, c'est {signature} de Leads and Business. Suite à ton échange avec Lucas, où en es-tu dans ta réflexion ? S'il reste une question qui te bloque, pose-la moi ici, je te réponds vite.",
+    rappel: "Salut {prenom}, c'est {signature} de Leads and Business. Petit rappel : ton appel avec Lucas commence {quand}.\nLe lien : {visio}\nÀ tout de suite.",
     noshow: "Salut {prenom}, c'est {signature} de Leads and Business. On t'a attendu pour ton appel avec Lucas, pas de souci, ça arrive. On le recale ? Prends le créneau qui t'arrange ici : {iclosed}",
     relance: "Salut {prenom}, c'est {signature} de Leads and Business. Ton appel avec Lucas n'a pas pu se faire. On en recale un ? Voici le lien : {iclosed}",
+    followup: "Salut {prenom}, c'est {signature} de Leads and Business. Suite à ton échange avec Lucas, où en es-tu dans ta réflexion ? S'il reste une question qui te bloque, pose-la moi ici, je te réponds vite.",
+    followup2: "Salut {prenom}, c'est {signature} de Leads and Business.\n{objection}\nQu'est-ce qui t'aiderait à prendre ta décision cette semaine ? Si tu veux, je te cale 15 min avec Lucas pour en parler.",
+    followup3: "Salut {prenom}, c'est {signature} de Leads and Business. Tu veux qu'on refasse un point de 15 min avec Lucas pour avancer sur ton projet ? Choisis ton créneau ici : {iclosed}",
+    followup_fin: "Salut {prenom}, c'est {signature} de Leads and Business. Je ne veux pas te relancer pour rien : le mentorat avec Lucas, c'est toujours d'actualité pour toi ? Un simple oui ou non me suffit.",
     reactivation: "Salut {prenom}, c'est {signature} de Leads and Business. Tu avais échangé avec Lucas il y a quelque temps. Où en es-tu aujourd'hui côté missions et revenus ? Si tu veux refaire le point, Lucas a quelques créneaux cette semaine : {iclosed}",
+    reactivation_ns: "Salut {prenom}, c'est {signature} de Leads and Business. Tu avais pris rendez-vous avec Lucas il y a quelque temps. Où en es-tu aujourd'hui côté missions et revenus ? Si tu veux faire le point avec lui, réserve ton créneau ici : {iclosed}",
     live: "Salut {prenom}, c'est {signature} de Leads and Business. Merci pour ton inscription au live de Lucas. Tu veux qu'il regarde ton cas de près, en 30 min ? Réserve ton créneau ici : {iclosed}",
   },
 };
-const TPL_LABELS = [['confirm', 'Confirmation du call (veille et jour J)'], ['followup', 'Follow-up après le call'], ['noshow', 'No-show : recaler'], ['relance', 'Call annulé : relancer'], ['reactivation', 'Réactivation des anciens leads'], ['live', 'Inscrit au live']];
+const TPL_LABELS = [['confirm', 'Confirmation du call (veille et jour J)'], ['rappel', 'Rappel 1 h avant le call'], ['noshow', 'No-show : recaler'], ['relance', 'Call annulé ou reporté : recaler'], ['followup', 'Follow-up · relance 1 (lendemain)'], ['followup2', "Follow-up · relance 2 (reprend l'objection)"], ['followup3', 'Follow-up · relance 3 (nouveau point)'], ['followup_fin', 'Follow-up · dernière relance'], ['reactivation', 'Réactivation · anciens leads vus en call'], ['reactivation_ns', 'Réactivation · no-shows, annulés, sans suite'], ['live', 'Inscrit au live']];
 
 // ---------- état ----------
-let S = { leads: [], inscrits: [], settings: {} };
-let ok = localStorage.getItem('cl_ok') === '1';
+let S = { leads: [], calls: [], inscrits: [], settings: {} };
+let IX = { lead: {}, calls: {}, kind: {}, hidden: new Set() };
+let ok = lsGet('cl_ok') === '1';
 let tab = (location.hash || '').replace('#', '') || 'today';
 let filter = 'tous', search = '';
 let expanded = new Set();
 let formOpen = false, formPrefill = null;
-let month = '';
+let period = ''; // '' = mois en cours, 'AAAA-MM' ou 'all' (partagé par Aujourd'hui, Calls et Chiffres)
+const PREF_DEF = { sort: 'next', src: '', temp: '', cView: 'passes', cFilter: 'tous', cKind: 'ventes', cSort: 'recent' };
+let prefs = readPrefs();
+let callSearch = '', callsLimit = 60, leadsLimit = 120;
 let inscritsLoaded = false, inscritsBusy = false;
 let icSync = '', icBusy = false, tgOn = false;
-let runner = null; // envoi un par un : { title, ids, i, kind }
-let modal = false; // réglages ouverts
+let runner = null; // envoi WhatsApp un par un
+let modal = null; // 'wa' | 'call' | 'settings' | 'brief' : pas de rendu de fond pendant une saisie
+let F = null; // fiche résultat ouverte
+let fillQueue = null; // remplissage un par un
+let lastWrite = 0;
 
-// ---------- utils ----------
+// ---------- utilitaires ----------
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { } }
+function readPrefs() { try { return { ...PREF_DEF, ...JSON.parse(lsGet('cl_prefs') || '{}') }; } catch (e) { return { ...PREF_DEF }; } }
+function setPref(k, v) { prefs[k] = v; lsSet('cl_prefs', JSON.stringify(prefs)); }
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pad = n => String(n).padStart(2, '0');
 function isoDate(d = new Date()) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-function isoNow() { const d = new Date(); return isoDate(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
-const TODAY = () => isoDate();
+// l'heure de référence est celle de Paris (heures des calls iClosed et du pont), quel que soit le fuseau du téléphone
+const PARIS = (() => { try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }); } catch (e) { return null; } })();
+function isoNow() {
+  const d = new Date();
+  if (!PARIS) return isoDate(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  const o = {}; PARIS.formatToParts(d).forEach(x => { o[x.type] = x.value; });
+  return o.year + '-' + o.month + '-' + o.day + 'T' + (o.hour === '24' ? '00' : o.hour) + ':' + o.minute + ':' + o.second;
+}
+function nowLocal() { return isoNow().slice(0, 16); }
+const TODAY = () => isoNow().slice(0, 10);
 function addDays(iso, n) { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return isoDate(d); }
-function daysBetween(a, b) { return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000); }
+function addMonths(iso, n) { const d = new Date(String(iso).slice(0, 10) + 'T12:00:00'); const day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate())); return isoDate(d); }
+function monthShift(k, n) { const d = new Date(k + '-15T12:00:00'); d.setMonth(d.getMonth() + n); return isoDate(d).slice(0, 7); }
+function dimOf(k) { return new Date(Number(k.slice(0, 4)), Number(k.slice(5, 7)), 0).getDate(); }
+function plusMin(iso, n) { const d = new Date(String(iso).slice(0, 16)); if (isNaN(d)) return ''; d.setMinutes(d.getMinutes() + n); return isoDate(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function daysBetween(a, b) { return Math.round((new Date(String(b).slice(0, 10) + 'T12:00:00') - new Date(String(a).slice(0, 10) + 'T12:00:00')) / 86400000); }
 function fmtDate(iso, opts) { if (!iso) return ''; const d = new Date(String(iso).slice(0, 10) + 'T12:00:00'); if (isNaN(d)) return String(iso); return d.toLocaleDateString('fr-FR', opts || { weekday: 'short', day: 'numeric', month: 'short' }); }
 function fmtTime(iso) { const s = String(iso || ''); return s.length >= 16 ? s.slice(11, 16).replace(':', 'h') : ''; }
-function fmtDT(iso) { if (!iso) return ''; const t = fmtTime(iso); return fmtDate(iso) + (t ? ' ' + t : ''); }
+function fmtDT(iso) { if (!iso) return ''; const t = fmtTime(iso); const y = String(iso).slice(0, 4) !== TODAY().slice(0, 4); return fmtDate(iso, y ? { day: 'numeric', month: 'short', year: 'numeric' } : undefined) + (t ? ' ' + t : ''); }
 function dayLabel(iso) { const t = TODAY(); if (iso === t) return "aujourd'hui"; if (iso === addDays(t, 1)) return 'demain'; if (iso === addDays(t, -1)) return 'hier'; return fmtDate(iso); }
-function quand(iso) { if (!iso) return ''; const d = iso.slice(0, 10), t = fmtTime(iso); const dl = dayLabel(d); return (['aujourd\'hui', 'demain'].includes(dl) ? dl : fmtDate(d, { weekday: 'long', day: 'numeric', month: 'long' })) + (t ? ' à ' + t : ''); }
-function ago(iso) { const n = daysBetween(iso.slice(0, 10), TODAY()); return n <= 0 ? "aujourd'hui" : n === 1 ? 'hier' : 'il y a ' + n + ' j'; }
+function quand(iso) { if (!iso) return ''; const d = iso.slice(0, 10), t = fmtTime(iso); const dl = dayLabel(d); return (["aujourd'hui", 'demain'].includes(dl) ? dl : fmtDate(d, { weekday: 'long', day: 'numeric', month: 'long' })) + (t ? ' à ' + t : ''); }
+function ago(iso) { const n = daysBetween(iso, TODAY()); return n <= 0 ? "aujourd'hui" : n === 1 ? 'hier' : n < 60 ? 'il y a ' + n + ' j' : n < 365 ? 'il y a ' + Math.round(n / 30.4) + ' mois' : "il y a plus d'un an"; }
 function firstName(n) { const f = String(n || '').trim().split(/\s+/)[0] || ''; return f ? f.charAt(0).toUpperCase() + f.slice(1).toLowerCase() : ''; }
 function monthKey(iso) { return iso ? String(iso).slice(0, 7) : ''; }
-function monthLabel(k) { if (!k) return ''; const d = new Date(k + '-15T12:00:00'); const s = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); return s.charAt(0).toUpperCase() + s.slice(1); }
-function euro(n) { n = Number(n) || 0; return n.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €'; }
-function pct(a, b) { return b ? Math.round(100 * a / b) + ' %' : '–'; }
+const MOIS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+const MOIS_C = ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
+function moisCourt(k) { return MOIS_C[Number(k.slice(5, 7)) - 1] + (k.slice(0, 4) === TODAY().slice(0, 4) ? '' : ' ' + k.slice(2, 4)); }
+function moisNom(k) { return MOIS[Number(k.slice(5, 7)) - 1] + (k.slice(0, 4) === TODAY().slice(0, 4) ? '' : ' ' + k.slice(0, 4)); }
+function euro(n) { n = Number(n) || 0; return Math.round(n).toLocaleString('fr-FR') + ' €'; }
+function pc(x) { return x === null || x === undefined || isNaN(x) ? '–' : Math.round(100 * x) + ' %'; }
+function ratio(a, b, min = 1) { return b >= min ? a / b : null; }
+function sumOf(arr, k) { return arr.reduce((s, x) => s + (Number(x[k]) || 0), 0); }
+function num(v) { if (v === '' || v == null) return ''; const n = Number(String(v).replace(/[\s €]/g, '').replace(',', '.')); return isNaN(n) ? '' : n; }
+function plural(n, s, p) { return n + ' ' + (n > 1 ? (p || s + 's') : s); }
 function phoneDigits(p) { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.length === 10 && d.startsWith('0')) d = '33' + d.slice(1); return d; }
-function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function newId(p = 'l') { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function stLabel(s) { const x = STATUS.find(a => a[0] === s); return x ? x[1] : s; }
 function stCls(s) { const x = STATUS.find(a => a[0] === s); return x ? x[2] : ''; }
 function srcLabel(s) { const x = SOURCES.find(a => a[0] === s); return x ? x[1] : (s || ''); }
-function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (err ? ' err' : ''); clearTimeout(t._h); t._h = setTimeout(() => t.className = 'toast', 2600); }
+function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (err ? ' err' : ''); clearTimeout(t._h); t._h = setTimeout(() => t.className = 'toast', 2800); }
 function setStatus(txt, cls) { $('#status').className = 'status ' + (cls || ''); $('#status-t').textContent = txt; }
-const STR_KEYS = ['name', 'phone', 'email', 'source', 'status', 'need', 'objection', 'next_action', 'notes', 'created', 'updated', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'confirmed', 'last_touch'];
+const STR_KEYS = ['name', 'phone', 'email', 'source', 'status', 'need', 'objection', 'next_action', 'notes', 'created', 'updated', 'ic_contact', 'ic_status', 'ic_info', 'ic_link', 'ic_event', 'ic_result', 'confirmed', 'last_touch', 'offer', 'payment', 'temp'];
+function numField(v) { return v === '' || v == null ? '' : (isNaN(Number(v)) ? '' : Number(v)); }
 function norm(l) {
   l.id = String(l.id || newId());
   STR_KEYS.forEach(k => { l[k] = l[k] == null ? '' : String(l[k]); });
   l.status = l.status || 'a_appeler';
-  ['score', 'price', 'paid', 'touches'].forEach(k => { l[k] = l[k] === '' || l[k] == null ? '' : Number(l[k]) || (Number(l[k]) === 0 ? 0 : ''); });
+  ['score', 'price', 'paid', 'touches'].forEach(k => { l[k] = numField(l[k]); });
   l.call_at = l.call_at ? String(l.call_at).slice(0, 16) : '';
   l.next_at = l.next_at ? String(l.next_at).slice(0, 10) : '';
   l.sold_at = l.sold_at ? String(l.sold_at).slice(0, 10) : '';
   l.last_touch = l.last_touch ? String(l.last_touch).slice(0, 10) : '';
   return l;
 }
+const CALL_STR = ['id', 'lead_id', 'created', 'updated', 'call_at', 'name', 'kind', 'event', 'closer', 'ic_state', 'show', 'result', 'temp', 'offer', 'payment', 'objection', 'reason', 'next_step', 'next_at', 'recording', 'notes', 'filled_at', 'conf_sent', 'conf_reply'];
+function normCall(c) {
+  CALL_STR.forEach(k => { c[k] = c[k] == null ? '' : String(c[k]); });
+  ['score', 'price', 'paid'].forEach(k => { c[k] = numField(c[k]); });
+  c.call_at = c.call_at.slice(0, 16); c.next_at = c.next_at.slice(0, 10);
+  return c;
+}
 function cfg() { const s = S.settings || {}; return { ...DEFAULTS, ...s, tpl: { ...DEFAULTS.tpl, ...(s.tpl || {}) } }; }
+function offers() {
+  return String(cfg().offres || '').split('\n').map(x => x.trim()).filter(Boolean).map(x => {
+    const m = x.match(/^(.*?)\s*[·=:|]\s*([\d\s.,]+)\s*€?$/);
+    return m ? { name: m[1].trim(), price: num(m[2]) } : { name: x, price: '' };
+  });
+}
+
+// ---------- index des calls ----------
+function isCancel(c) { return c.ic_state === 'annule' || c.show === 'annule' || c.show === 'reporte'; }
+function reindex() {
+  const now = nowLocal();
+  IX = { lead: {}, calls: {}, kind: {}, hidden: new Set() };
+  S.leads.forEach(l => { IX.lead[l.id] = l; });
+  S.calls.forEach(c => { (IX.calls[c.lead_id] = IX.calls[c.lead_id] || []).push(c); });
+  Object.values(IX.calls).forEach(list => {
+    list.sort((a, b) => a.call_at.localeCompare(b.call_at));
+    // un call ajouté à la main s'efface si iClosed a une réservation le même jour pour ce lead
+    list.forEach(c => { if (!c.id.startsWith('icc') && !c.show && list.some(x => x !== c && x.id.startsWith('icc') && !isCancel(x) && x.call_at.slice(0, 10) === c.call_at.slice(0, 10))) IX.hidden.add(c.id); });
+    let seen = false;
+    list.forEach(c => {
+      if (IX.hidden.has(c.id)) return;
+      if (c.kind === 'client') { IX.kind[c.id] = 'client'; return; }
+      IX.kind[c.id] = seen ? 'suivi' : 'r1';
+      if (c.show === 'present' || (!c.show && !isCancel(c) && c.call_at < now)) seen = true;
+    });
+  });
+}
+function cKind(c) { return IX.kind[c.id] || (c.kind === 'client' ? 'client' : 'r1'); }
+function kindLabel(k) { return k === 'client' ? 'Séance client' : k === 'suivi' ? 'Suivi' : 'R1'; }
+function isSale(c) { return cKind(c) !== 'client'; }
+function vis(c) { if (IX.hidden.has(c.id)) return false; const l = IX.lead[c.lead_id]; return !(l && l.status === 'ecarte'); }
+function ended(c) { return !!c.call_at && plusMin(c.call_at, 30) <= nowLocal(); }
+function callsOfLead(id) { return (IX.calls[id] || []).filter(c => !IX.hidden.has(c.id)); }
+function nextCallOf(id) { return callsOfLead(id).find(c => !isCancel(c) && !c.show && !ended(c)); }
+function callById(id) { return S.calls.find(c => c.id === id); }
 
 // ---------- stockage local (repli + file d'attente) ----------
 function loadLocal() {
-  try { S.leads = (JSON.parse(localStorage.getItem('cl_leads') || '[]')).map(norm); } catch (e) { S.leads = []; }
-  try { S.settings = JSON.parse(localStorage.getItem('cl_settings') || '{}'); } catch (e) { S.settings = {}; }
+  try { S.leads = (JSON.parse(lsGet('cl_leads') || '[]')).map(norm); } catch (e) { S.leads = []; }
+  try { S.calls = (JSON.parse(lsGet('cl_calls') || '[]')).map(normCall); } catch (e) { S.calls = []; }
+  try { S.settings = JSON.parse(lsGet('cl_settings') || '{}'); } catch (e) { S.settings = {}; }
+  reindex();
 }
-function saveLocal() { try { localStorage.setItem('cl_leads', JSON.stringify(S.leads)); localStorage.setItem('cl_settings', JSON.stringify(S.settings)); } catch (e) { } }
-function getQueue() { try { return JSON.parse(localStorage.getItem('cl_queue') || '[]'); } catch (e) { return []; } }
-function setQueue(q) { try { localStorage.setItem('cl_queue', JSON.stringify(q)); } catch (e) { } }
+function saveLocal() { lsSet('cl_leads', JSON.stringify(S.leads)); lsSet('cl_calls', JSON.stringify(S.calls)); lsSet('cl_settings', JSON.stringify(S.settings)); }
+function getQueue() { try { return JSON.parse(lsGet('cl_queue') || '[]'); } catch (e) { return []; } }
+function setQueue(q) { lsSet('cl_queue', JSON.stringify(q)); }
 
 // ---------- pont ----------
 async function post(payload) {
@@ -362,45 +571,64 @@ async function get(what) {
   if (!j.ok) throw new Error(j.error || 'réponse pont');
   return j;
 }
-function stamp() { return 'en direct · ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + (icSync ? ' · iClosed ' + fmtTime(icSync) : ''); }
-async function send(op) {
-  try {
-    await post(op);
-    const q = getQueue();
-    setStatus(q.length ? `${stamp()} · ${q.length} en attente` : stamp());
-    return true;
-  } catch (e) {
-    if (e.server) { toast('Refusé par le pont : ' + e.message, true); return false; }
-    queuePush(op);
-    setStatus(`hors ligne · ${getQueue().length} en attente`, 'err');
-    return false;
-  }
-}
-// une écriture en attente par lead : les champs se cumulent
+function stamp() { return 'en direct · ' + fmtTime(isoNow()) + (icSync ? ' · iClosed ' + fmtTime(icSync) : ''); }
+// Toutes les écritures passent par une file gardée dans le téléphone et partent une par une, dans l'ordre :
+// pas de relance qui arrive avant la création d'un lead, rien de perdu si le pont est occupé ou le réseau coupé.
+let inflight = '', pumpP = null;
+function send(op) { queuePush(op); return pump(); }
+// une écriture qui suit une écriture du même lead ou du même call s'y ajoute (sauf si celle-ci est déjà en cours d'envoi)
 function queuePush(op) {
-  const q = getQueue();
-  const prev = op.what === 'upsert' && op.lead ? q.find(o => o.what === 'upsert' && o.lead && o.lead.id === op.lead.id) : null;
-  if (prev) Object.assign(prev.lead, op.lead); else q.push(op);
+  const q = getQueue(), last = q[q.length - 1];
+  const same = last && last._qid !== inflight && last.what === op.what && ((op.what === 'upsert' && last.lead && op.lead && last.lead.id === op.lead.id) || (op.what === 'call_upsert' && last.call && op.call && last.call.id === op.call.id));
+  if (same) {
+    if (op.lead) last.lead = { ...(last.lead || {}), ...op.lead };
+    if (op.call) last.call = { ...last.call, ...op.call };
+    if (op.create) last.create = true;
+  } else q.push({ ...op, _qid: newId('q') });
   setQueue(q);
 }
-async function flushQueue() {
-  const q = getQueue();
-  while (q.length) {
-    try { await post(q[0]); q.shift(); setQueue(q); }
-    catch (e) { if (e.server) { q.shift(); setQueue(q); continue; } return false; }
+const FATAL = /bad key|bad json|introuvable/i; // refus définitifs : l'écriture est abandonnée
+function pump() {
+  if (!pumpP) pumpP = runPump().then(ok => { pumpP = null; return ok && getQueue().length ? pump() : ok; }, () => { pumpP = null; return false; });
+  return pumpP;
+}
+async function runPump() {
+  let ok = true, busy = false;
+  for (;;) {
+    const op = getQueue()[0]; if (!op) break;
+    inflight = op._qid;
+    let done = false;
+    try { const { _qid, _tries, ...payload } = op; await post(payload); done = true; }
+    catch (e) {
+      if (e.server && FATAL.test(e.message)) { toast('Refusé par le pont : ' + e.message, true); done = true; }
+      else if (e.server && (op._tries || 0) >= 4) { toast('Écriture abandonnée après 5 essais : ' + e.message, true); done = true; }
+      else {
+        if (e.server) { busy = true; const q = getQueue(), o = q.find(x => x._qid === op._qid); if (o) { o._tries = (o._tries || 0) + 1; setQueue(q); } }
+        ok = false;
+      }
+    }
+    inflight = '';
+    if (!done) break;
+    setQueue(getQueue().filter(x => x._qid !== op._qid));
   }
-  return true;
+  const n = getQueue().length;
+  if (n) setStatus(`${busy ? 'pont occupé' : 'hors ligne'} · ${n} en attente`, 'err');
+  else if (ok) setStatus(stamp());
+  return ok && !n;
 }
 async function load(silent) {
   if (!silent) setStatus('chargement', 'busy');
-  const flushed = await flushQueue();
+  const flushed = await pump();
+  const t0 = Date.now();
   try {
     if (!flushed) throw new Error('file en attente');
     const j = await get('all');
+    if (lastWrite > t0) { setTimeout(() => load(true), 2500); return; } // une saisie est partie pendant la lecture : on relit après
     S.leads = (j.leads || []).map(norm);
+    S.calls = (j.calls || []).map(normCall);
     S.settings = j.settings || {};
     icSync = j.ic_sync || ''; tgOn = !!j.tg;
-    saveLocal();
+    reindex(); saveLocal();
     setStatus(stamp());
     if (j.ic_due) syncIclosed(false);
   } catch (e) {
@@ -408,12 +636,14 @@ async function load(silent) {
     const q = getQueue();
     setStatus('hors ligne · copie locale' + (q.length ? ` · ${q.length} en attente` : ''), 'err');
   }
-  if (!runner && !modal && !document.querySelector('.inp:focus')) render();
+  bgRender();
 }
+// rendu de fond (rechargement, synchro) : jamais pendant une fenêtre, le formulaire nouveau lead ou un champ en cours
+function bgRender() { if (!modal && !(formOpen && tab === 'leads') && !document.querySelector('.inp:focus')) render(); }
 async function syncIclosed(force) {
   if (icBusy) return;
   icBusy = true;
-  if (force) { setStatus('synchro iClosed…', 'busy'); render(); }
+  if (force) { setStatus('synchro iClosed…', 'busy'); bgRender(); }
   try {
     const j = await get('sync' + (force ? '&force=1' : ''));
     if (force) toast(j.created || j.updated ? `iClosed : ${j.created} nouveau(x), ${j.updated} mis à jour` : 'iClosed : rien de nouveau');
@@ -426,120 +656,233 @@ async function syncIclosed(force) {
 }
 async function loadInscrits(force) {
   if (inscritsBusy) return;
-  if (!force) { try { const c = JSON.parse(localStorage.getItem('cl_inscrits') || 'null'); if (c && c.list) { S.inscrits = c.list; inscritsLoaded = true; } } catch (e) { } }
-  inscritsBusy = true; if (tab === 'inscrits') render();
+  if (!force) { try { const c = JSON.parse(lsGet('cl_inscrits') || 'null'); if (c && c.list) { S.inscrits = c.list; inscritsLoaded = true; } } catch (e) { } }
+  inscritsBusy = true; if (tab === 'inscrits') bgRender();
   try {
     const j = await get('inscrits');
     S.inscrits = j.inscrits || [];
     inscritsLoaded = true;
-    try { localStorage.setItem('cl_inscrits', JSON.stringify({ at: isoNow(), list: S.inscrits })); } catch (e) { }
+    lsSet('cl_inscrits', JSON.stringify({ at: isoNow(), list: S.inscrits }));
   } catch (e) { if (force) toast('Inscrits indisponibles : ' + e.message, true); }
-  inscritsBusy = false; if (!runner && !modal) render();
+  inscritsBusy = false; bgRender();
 }
 
-// ---------- écriture d'un lead (seuls les champs changés partent) ----------
+// ---------- écritures (seuls les champs changés partent) ----------
 function patch(id, changes, opts = {}) {
-  const l = S.leads.find(x => x.id === id); if (!l) return;
+  const l = IX.lead[id]; if (!l) return;
   Object.assign(l, changes); l.updated = isoNow(); norm(l);
-  saveLocal();
-  if (!opts.silent) { if (opts.soft) softRefresh(id); else render(); }
+  lastWrite = Date.now(); saveLocal();
+  if (!opts.silent) { if (opts.soft) softRefresh(id); else if (!modal) render(); }
   send({ what: 'upsert', lead: { id, ...changes } });
 }
 function upd(id, k, v, soft) {
-  if (['score', 'price', 'paid'].includes(k)) v = v === '' || v === null ? '' : Number(v);
+  if (['score', 'price', 'paid'].includes(k)) v = num(v);
   else v = String(v ?? '');
   const ch = { [k]: v };
-  if (k === 'status') Object.assign(ch, autoFor(v));
+  if (k === 'status') Object.assign(ch, autoFor(v, IX.lead[id]));
   patch(id, ch, { soft: soft && k !== 'status' });
 }
 function softRefresh(id) {
-  const l = S.leads.find(x => x.id === id);
+  const l = IX.lead[id];
   const s = $('#sum-' + id); if (s && l) s.innerHTML = leadSummary(l);
 }
-// ce que chaque statut déclenche tout seul
-function autoFor(status) {
+// ce que chaque statut déclenche tout seul (changement à la main dans la fiche)
+function autoFor(status, l) {
   const t = TODAY();
-  if (status === 'followup') return { next_at: addDays(t, 1), next_action: 'Relance follow-up 1', touches: 0 };
-  if (status === 'noshow') return { next_at: t, next_action: 'Reprogrammer le call', touches: 0 };
+  if (status === 'followup') return { next_at: addDays(t, 1), next_action: 'Relance follow-up', touches: 0 };
+  if (status === 'noshow') return { next_at: t, next_action: 'Recaler le call', touches: 0 };
   if (status === 'a_appeler') return { next_at: t, next_action: 'Relancer', touches: 0 };
-  if (status === 'vendu') return { next_at: '', next_action: '', sold_at: t };
-  if (status === 'perdu' || status === 'booke') return { next_at: '', next_action: '' };
+  if (status === 'vendu') return { next_at: '', next_action: '', ...(l && l.sold_at ? {} : { sold_at: t }) };
+  if (['perdu', 'booke', 'ecarte', 'ancien'].includes(status)) return { next_at: '', next_action: '' };
+  if (status === 'fait') return { next_at: addDays(t, 1), next_action: 'Définir la suite du call' };
   return {};
 }
-function setResult(id, res) {
-  const l = S.leads.find(x => x.id === id); if (!l) return;
-  const ch = { status: res, ...autoFor(res) };
-  if (res === 'vendu') {
-    const p = prompt(`Vendu à ${firstName(l.name)} : montant (€) ?`, l.price || '');
-    if (p === null) return;
-    if (p.trim()) ch.price = Number(p.replace(/[^\d.,]/g, '').replace(',', '.')) || '';
-    toast('Vendu, bien joué');
-  }
-  if (res === 'followup') toast('Follow-up : relance demain, puis J+2, J+3, J+7');
-  if (res === 'noshow') toast("No-show : message pour recaler prêt aujourd'hui");
-  patch(id, ch);
+// écrit un call (et la fiche lead) : create = nouveau call ajouté dans la console
+function setCall(c, ch, opts = {}) {
+  const diff = {};
+  Object.keys(ch).forEach(k => { if (opts.create || String(c[k] ?? '') !== String(ch[k] ?? '')) diff[k] = ch[k]; });
+  const lead = opts.lead && Object.keys(opts.lead).length > 1 ? opts.lead : null;
+  if (!Object.keys(diff).length && !lead) return;
+  Object.assign(c, diff); c.updated = isoNow(); normCall(c);
+  if (lead) { const l = IX.lead[lead.id]; if (l) { Object.assign(l, lead); l.updated = isoNow(); norm(l); } }
+  lastWrite = Date.now(); reindex(); saveLocal();
+  if (!opts.silent && !modal) render();
+  send({ what: 'call_upsert', call: { id: c.id, ...diff }, ...(lead ? { lead } : {}), ...(opts.create ? { create: true } : {}) });
 }
-function snooze(id, n) { patch(id, { next_at: addDays(TODAY(), n) }); toast('Reporté au ' + fmtDate(addDays(TODAY(), n))); }
+function addCallFor(leadId, at, kind) {
+  const l = IX.lead[leadId]; if (!l || !at) return null;
+  const c = normCall({ id: newId('c'), lead_id: leadId, created: nowLocal(), updated: isoNow(), call_at: at.slice(0, 16), name: l.name, kind: kind === 'client' ? 'client' : 'r1', event: 'Ajouté dans la console', closer: 'Lucas', ic_state: '' });
+  S.calls.push(c);
+  const lc = { id: leadId };
+  if (c.call_at > (l.call_at || '')) lc.call_at = c.call_at;
+  if (c.call_at >= nowLocal() && kind !== 'client' && l.status !== 'vendu') Object.assign(lc, { status: 'booke', next_at: '', next_action: '' });
+  setCall(c, { ...c }, { create: true, lead: lc, silent: true });
+  return c;
+}
 
-// ---------- messages WhatsApp ----------
-function kindOf(l) {
-  const t = TODAY();
-  if (l.call_at && l.call_at.slice(0, 10) >= t && ['booke', 'a_appeler'].includes(l.status)) return 'confirm';
-  if (l.status === 'noshow') return 'noshow';
-  if (l.status === 'followup' || l.status === 'fait') return 'followup';
-  if (l.status === 'ancien') return 'reactivation';
-  if (/live/.test(l.source) && !l.call_at) return 'live';
-  if (/réactiv/i.test(l.next_action)) return 'reactivation';
-  return 'relance';
+// ---------- résultat d'un call -> fiche lead ----------
+// Seul ce qui change est reporté sur la fiche : rouvrir un call pour ajouter une note ne remet ni les relances
+// à zéro ni l'encaissé en arrière. Un call plus ancien que le dernier call du lead ne touche pas à la fiche,
+// sauf une vente (une vente reste une vente). Une fiche vendue ou écartée n'est jamais rouverte par un call.
+function commitCall(c, f) {
+  const l = IX.lead[c.lead_id];
+  const lc = {};
+  const changed = k => f[k] !== undefined && String(f[k] ?? '') !== String(c[k] ?? '');
+  const outcome = changed('show') || changed('result');
+  if (l && f.kind !== 'client') {
+    const later = callsOfLead(l.id).some(x => x.id !== c.id && !isCancel(x) && isSale(x) && x.call_at > c.call_at);
+    const st = l.status;
+    if (f.show === 'present' && f.result === 'vendu') {
+      if (outcome) Object.assign(lc, { status: 'vendu', sold_at: c.call_at.slice(0, 10) <= TODAY() ? c.call_at.slice(0, 10) : TODAY(), next_at: '', next_action: '', temp: '' });
+      if ((outcome || changed('payment')) && f.payment) lc.payment = f.payment;
+      if ((outcome || changed('price')) && f.price !== '') lc.price = f.price;
+      if ((outcome || changed('offer')) && f.offer) lc.offer = f.offer;
+      if ((outcome || changed('score')) && f.score !== '') lc.score = f.score;
+      if (f.paid !== '' && Number(f.paid) > (Number(l.paid) || 0)) lc.paid = f.paid;
+    } else if (!later && st !== 'vendu' && st !== 'ecarte') {
+      if (changed('score') && f.score !== '' && f.score != null) lc.score = f.score;
+      if (f.show === 'present') {
+        if (changed('objection') && f.objection) lc.objection = f.objection;
+        if (changed('offer') && f.offer) lc.offer = f.offer;
+        if (f.result === 'followup') {
+          if (changed('price') && f.price !== '') lc.price = f.price;
+          if (outcome) Object.assign(lc, { status: 'followup', touches: 0 });
+          if (outcome || changed('next_at') || changed('next_step')) Object.assign(lc, { next_at: f.next_at || addDays(TODAY(), 1), next_action: f.next_step || 'Relance follow-up' });
+          if (outcome || changed('temp')) lc.temp = f.temp;
+        } else if (outcome && (f.result === 'perdu' || f.result === 'non_qualifie')) Object.assign(lc, { status: 'perdu', next_at: '', next_action: '', temp: '' });
+      } else if (outcome && st !== 'perdu') {
+        if (f.show === 'noshow') Object.assign(lc, { status: 'noshow', next_at: TODAY(), next_action: 'Recaler le call', touches: 0 });
+        if (f.show === 'reporte' || f.show === 'annule') Object.assign(lc, { status: 'a_appeler', next_at: TODAY(), next_action: f.show === 'reporte' ? 'Recaler le call (reporté)' : 'Call annulé : recaler', touches: 0 });
+      }
+    }
+  }
+  const lead = { id: c.lead_id };
+  if (l) Object.keys(lc).forEach(k => { if (String(l[k] ?? '') !== String(lc[k] ?? '')) lead[k] = lc[k]; });
+  setCall(c, { ...f, filled_at: isoNow() }, { lead, silent: true });
+  return outcome;
 }
-function msgFor(l, kind) {
-  const c = cfg();
-  let m = c.tpl[kind || kindOf(l)] || '';
-  if (!l.ic_link) m = m.split('\n').filter(x => !x.includes('{visio}')).join('\n');
-  return m.replace(/\{prenom\}/g, firstName(l.name)).replace(/\{quand\}/g, quand(l.call_at)).replace(/\{visio\}/g, l.ic_link || '')
-    .replace(/\{iclosed\}/g, c.iclosed).replace(/\{signature\}/g, c.signature || 'Alex').replace(/ {2,}/g, ' ').trim();
-}
-function waUrl(l, text) { const d = phoneDigits(l.phone); return d ? `https://wa.me/${d}?text=${encodeURIComponent(text)}` : ''; }
-// ouvre WhatsApp et enregistre ce qui a été fait
-function sendWa(id, kind, customText) {
-  const l = S.leads.find(x => x.id === id); if (!l) return;
-  const k = kind || kindOf(l);
-  const url = waUrl(l, customText || msgFor(l, k));
-  if (!url) { toast('Pas de numéro sur cette fiche', true); return; }
-  window.open(url, '_blank', 'noopener');
-  if (k === 'confirm') { patch(id, { confirmed: isoNow() }, { silent: !!runner }); toast('Confirmation notée'); return; }
-  touched(id, !!runner);
-}
-function touched(id, silent) {
-  const l = S.leads.find(x => x.id === id); if (!l) return;
-  const n = (Number(l.touches) || 0) + 1, t = TODAY();
-  const ch = { touches: n, last_touch: t };
-  if (l.status === 'ancien') { ch.status = 'a_appeler'; }
-  if (n > STEPS.length) { ch.next_at = addDays(t, 7); ch.next_action = `${n} relances sans suite : passer en perdu ?`; }
-  else { ch.next_at = addDays(t, STEPS[n - 1]); ch.next_action = (l.status === 'ancien' || /réactiv/i.test(l.next_action) ? 'Réactivation' : l.status === 'noshow' ? 'Recaler le call' : l.status === 'followup' ? 'Relance follow-up' : 'Relance') + ' ' + (n + 1); }
-  patch(id, ch, { silent });
-  if (!silent) toast(`Relance ${n} notée · prochaine ${dayLabel(ch.next_at)}`);
+function quickShow(id, v) {
+  const c = callById(id); if (!c) return;
+  commitCall(c, { show: v, result: '' });
+  dropDraft(id);
+  toast(v === 'noshow' ? "No-show noté : à recaler aujourd'hui (Relances)" : "Noté : à recaler aujourd'hui (Relances)");
+  render();
 }
 
 // ---------- listes métier ----------
-function toFill() { const t = TODAY(), lim = addDays(t, -30); return S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) < t && l.call_at.slice(0, 10) >= lim && ['booke', 'a_appeler'].includes(l.status) && !/relanc|recal/i.test(l.next_action)).sort((a, b) => b.call_at.localeCompare(a.call_at)); }
-function callsOn(d) { return S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) === d && !['perdu', 'ancien'].includes(l.status)).sort((a, b) => a.call_at.localeCompare(b.call_at)); }
-function relances() { const t = TODAY(); return S.leads.filter(l => l.next_at && l.next_at <= t && OPEN.includes(l.status) && !(l.call_at && l.call_at.slice(0, 10) >= t && l.status === 'booke')).sort((a, b) => a.next_at.localeCompare(b.next_at)); }
-function reactivables() { return S.leads.filter(l => l.status === 'ancien' && l.phone && /follow|no-show|sans résultat|annulé/i.test(l.ic_result) && !l.last_touch).sort((a, b) => (/follow/i.test(b.ic_result) - /follow/i.test(a.ic_result)) || String(b.call_at).localeCompare(String(a.call_at))); }
-function upcoming() { const t = TODAY(); return S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) >= t && ['booke', 'a_appeler', 'followup'].includes(l.status)).sort((a, b) => a.call_at.localeCompare(b.call_at)); }
+function toFill() { const lim = addDays(TODAY(), -30); return S.calls.filter(c => vis(c) && isSale(c) && !isCancel(c) && !c.show && ended(c) && c.call_at.slice(0, 10) >= lim).sort((a, b) => b.call_at.localeCompare(a.call_at)); }
+function upcoming() { return S.calls.filter(c => vis(c) && !isCancel(c) && !c.show && c.call_at && !ended(c)).sort((a, b) => a.call_at.localeCompare(b.call_at)); }
+function relances() { const t = TODAY(); return S.leads.filter(l => l.next_at && l.next_at <= t && OPEN.includes(l.status) && !nextCallOf(l.id)).sort((a, b) => a.next_at.localeCompare(b.next_at)); }
+function talked(l) { return /follow|pas intéressé|pas qualifié|vendu/i.test(l.ic_result) || callsOfLead(l.id).some(c => c.show === 'present'); }
+function reactKind(l) { return talked(l) ? 'reactivation' : 'reactivation_ns'; }
+// client = a acheté ou a des séances d'accompagnement
+function isClient(l) { return l.status === 'vendu' || callsOfLead(l.id).some(c => cKind(c) === 'client'); }
+function reactivables() { return S.leads.filter(l => l.status === 'ancien' && !isClient(l) && phoneDigits(l.phone) && /follow|no-show|sans résultat|annulé/i.test(l.ic_result) && !l.last_touch).sort((a, b) => (/follow/i.test(b.ic_result) - /follow/i.test(a.ic_result)) || String(b.call_at).localeCompare(String(a.call_at))); }
 function inscritsSansFiche() { return S.inscrits.filter(i => (i.email || i.tel) && !leadFor(i)); }
+// un call à venir, ou passé depuis moins de 30 jours et pas encore rempli
+function pendingCall(l) { const lim = addDays(TODAY(), -30); return !!nextCallOf(l.id) || callsOfLead(l.id).some(c => isSale(c) && !isCancel(c) && !c.show && c.call_at.slice(0, 10) >= lim); }
+// fiches qui passent entre les mailles
+function oublies() {
+  const open = S.leads.filter(l => OPEN.includes(l.status));
+  return {
+    nonext: open.filter(l => !l.next_at && !pendingCall(l)),
+    nophone: open.filter(l => !phoneDigits(l.phone)),
+    noamount: S.leads.filter(l => l.status === 'vendu' && !(Number(l.price) > 0)),
+  };
+}
+// encaissements : échéances mensuelles à partir de la date de vente
+function payPlan(l) {
+  if (l.status !== 'vendu' || !l.payment || l.payment === 'autre' || !l.sold_at) return null;
+  const price = Number(l.price) || 0, paid = Number(l.paid) || 0;
+  if (!price) return null;
+  const n = { comptant: 1, '2x': 2, '3x': 3, '4x': 4 }[l.payment] || 1;
+  const part = Math.round(price / n);
+  if (paid >= price - 1) return { n, part, done: n, rest: 0, due: '', late: false, price, paid, next: 0 };
+  const done = Math.min(n - 1, Math.floor((paid + 1) / part));
+  const due = addMonths(l.sold_at, done);
+  return { n, part, done, rest: price - paid, due, late: due <= TODAY(), price, paid, next: Math.min(part, price - paid) };
+}
+function duePayments() { return S.leads.map(l => ({ l, p: payPlan(l) })).filter(x => x.p && x.p.rest > 0 && x.p.late); }
+function cashIn(id) {
+  const l = IX.lead[id]; if (!l) return;
+  const p = payPlan(l);
+  const def = p ? p.next : Math.max(0, (Number(l.price) || 0) - (Number(l.paid) || 0));
+  const v = prompt(`Montant reçu de ${firstName(l.name) || 'ce client'} (€) :`, def || '');
+  if (v === null) return;
+  const n = num(v); if (!(n > 0)) { toast('Montant invalide', true); return; }
+  patch(id, { paid: (Number(l.paid) || 0) + n });
+  toast(`${euro(n)} encaissés`);
+}
 
-function monthStats(m) {
-  const t = TODAY();
-  const inM = iso => m === 'all' ? !!iso : monthKey(iso) === m;
-  const calls = S.leads.filter(l => l.call_at && inM(l.call_at) && l.call_at.slice(0, 10) < t && l.status !== 'ancien' || (l.status === 'ancien' && l.call_at && inM(l.call_at) && /pas|vendu|follow|no-show/i.test(l.ic_result)));
-  const shows = calls.filter(l => ['fait', 'followup', 'vendu', 'perdu'].includes(l.status) || (l.status === 'ancien' && /pas|follow/i.test(l.ic_result)));
-  const noshow = calls.filter(l => l.status === 'noshow' || (l.status === 'ancien' && /no-show/i.test(l.ic_result)));
-  const blank = calls.filter(l => ['booke', 'a_appeler'].includes(l.status));
-  const ventes = S.leads.filter(l => l.status === 'vendu' && l.sold_at && inM(l.sold_at));
-  const ca = ventes.reduce((s, l) => s + (Number(l.price) || 0), 0);
-  const cash = ventes.reduce((s, l) => s + (Number(l.paid) || 0), 0);
-  return { calls, shows, noshow, blank, ventes, ca, cash };
+// ---------- stats (calculées sur les calls) ----------
+function perRange(p) { return p === 'all' ? { all: true } : { from: p + '-01', to: p + '-31' }; }
+function prevRange(p) {
+  if (p === 'all') return null;
+  const pk = monthShift(p, -1), cur = monthKey(TODAY());
+  return p === cur ? { from: pk + '-01', to: pk + '-' + pad(Math.min(Number(TODAY().slice(8, 10)), dimOf(pk))) } : { from: pk + '-01', to: pk + '-31' };
+}
+function inRange(iso, r) { if (!iso) return false; if (r.all) return true; const d = String(iso).slice(0, 10); return d >= r.from && d <= r.to; }
+function stats(r) {
+  const booked = S.calls.filter(c => vis(c) && isSale(c) && inRange(c.call_at, r));
+  const annules = booked.filter(isCancel);
+  const passes = booked.filter(c => !isCancel(c) && ended(c));
+  const tenus = passes.filter(c => c.show === 'present');
+  const noshow = passes.filter(c => c.show === 'noshow');
+  const blank = passes.filter(c => !c.show);
+  const pitches = tenus.filter(c => c.result && c.result !== 'non_qualifie');
+  const fus = tenus.filter(c => c.result === 'followup');
+  const pv = tenus.filter(c => c.result === 'perdu');
+  const nq = tenus.filter(c => c.result === 'non_qualifie');
+  const ventes = S.leads.filter(l => l.status === 'vendu' && inRange(l.sold_at, r));
+  const ca = sumOf(ventes, 'price'), cash = sumOf(ventes, 'paid');
+  const scored = tenus.filter(c => c.score !== '');
+  return {
+    booked, annules, passes, tenus, noshow, blank, pitches, fus, pv, nq, ventes, ca, cash,
+    show: ratio(tenus.length, tenus.length + noshow.length),
+    closing: ratio(ventes.length, tenus.length),
+    closingP: ratio(ventes.length, pitches.length),
+    panier: ventes.length ? ca / ventes.length : null,
+    qualif: scored.length ? sumOf(scored, 'score') / scored.length : null,
+    parCall: tenus.length ? ca / tenus.length : null,
+  };
+}
+function curKey() { return monthKey(TODAY()); }
+function perKey() { return period === 'all' ? 'all' : (period || curKey()); }
+function perLabel(p) { return p === 'all' ? 'depuis le début' : p === curKey() ? moisNom(p).toLowerCase() : moisNom(p); }
+function monthsWithData() {
+  const set = new Set([curKey()]);
+  S.calls.forEach(c => { if (vis(c) && isSale(c) && c.call_at) set.add(monthKey(c.call_at)); });
+  S.leads.forEach(l => { if (l.status === 'vendu' && l.sold_at) set.add(monthKey(l.sold_at)); });
+  return [...set].filter(k => /^\d{4}-\d{2}$/.test(k) && k <= curKey()).sort().reverse();
+}
+function setPeriod(k) { if (!k) return; period = k === curKey() ? '' : k; callsLimit = 60; render(); }
+function periodBar() {
+  const cur = curKey(), sel = perKey();
+  const prev = [monthShift(cur, -1), monthShift(cur, -2)];
+  const others = monthsWithData().filter(k => k !== cur && !prev.includes(k));
+  const b = (k, lb) => `<button class="${sel === k ? 'on' : ''}" onclick="setPeriod('${k}')">${lb}</button>`;
+  const selOn = others.includes(sel);
+  return `<div class="per"><span class="lab">Période</span>${b(cur, 'Mois en cours')}${prev.map(k => b(k, moisNom(k))).join('')}${b('all', 'Tout')}${others.length ? `<select class="${selOn ? 'on' : ''}" onchange="setPeriod(this.value)" aria-label="Autre mois"><option value="" disabled ${selOn ? '' : 'selected'}>Autre mois</option>${others.map(k => `<option value="${k}" ${sel === k ? 'selected' : ''}>${moisNom(k)}</option>`).join('')}</select>` : ''}</div>`;
+}
+function delta(cur, prev, kind) {
+  if (cur === null || cur === undefined || prev === null || prev === undefined) return '';
+  if (kind === 'rate') { const d = Math.round(100 * (cur - prev)); return d ? `<span class="delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ +' : '▼ '}${d} pts</span>` : ''; }
+  const d = Math.round(cur - prev); if (!d) return '';
+  const s = kind === 'eur' ? euro(Math.abs(d)) : Math.abs(d);
+  return `<span class="delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲ +' : '▼ -'}${s}</span>`;
+}
+// taux pour le plan du mois : 90 derniers jours si assez de calls remplis, sinon les taux visés des réglages
+function planRates() {
+  const c = cfg();
+  const r90 = stats({ from: addDays(TODAY(), -90), to: TODAY() });
+  const vus = r90.tenus.length + r90.noshow.length;
+  const real = vus >= 8 && r90.tenus.length >= 5;
+  const show = real ? Math.max(r90.show, 0.3) : (Number(c.show_vise) || 70) / 100;
+  const closing = real ? Math.max(r90.closing || 0, 0.05) : (Number(c.closing_vise) || 20) / 100;
+  const sold = S.leads.filter(l => l.status === 'vendu' && Number(l.price) > 0);
+  const offerP = offers().map(o => Number(o.price) || 0).find(Boolean) || 0;
+  const panier = sold.length ? sumOf(sold, 'price') / sold.length : offerP;
+  return { show, closing, panier, real };
 }
 
 // ================= RENDU =================
@@ -552,169 +895,568 @@ function renderLock() {
   $('#code').focus();
 }
 function checkCode() {
-  if ($('#code').value.trim().toLowerCase() === CODE) { ok = true; localStorage.setItem('cl_ok', '1'); render(); load(); loadInscrits(); }
+  if ($('#code').value.trim().toLowerCase() === CODE) { ok = true; lsSet('cl_ok', '1'); render(); load(); loadInscrits(); }
   else { toast('Code incorrect', true); $('#code').value = ''; }
 }
-function showTab(t) { tab = t; location.hash = t; if (t === 'inscrits' && !inscritsLoaded) loadInscrits(); render(); scrollTo(0, 0); }
+function showTab(t) { tab = t; if (location.hash !== '#' + t) history.replaceState(null, '', '#' + t); if (t === 'inscrits' && !inscritsLoaded) loadInscrits(); render(); scrollTo(0, 0); }
 function render() {
   if (!ok) return renderLock();
   if (!TABS.some(x => x[0] === tab)) tab = 'today';
-  const nToday = toFill().length + relances().length + callsOn(TODAY()).filter(l => !l.confirmed).length;
+  const t = TODAY();
+  const nToday = toFill().length + relances().length + upcoming().filter(c => c.call_at.slice(0, 10) === t && isSale(c) && c.conf_reply !== 'ok').length + duePayments().length;
+  const nUp = upcoming().filter(isSale).length;
   const nIns = inscritsSansFiche().length;
   $('#tabs').innerHTML = TABS.map(([id, lbl]) => {
     let b = '';
     if (id === 'today' && nToday) b = `<span class="badge alert">${nToday}</span>`;
-    if (id === 'calls' && upcoming().length) b = `<span class="badge">${upcoming().length}</span>`;
+    if (id === 'calls' && nUp) b = `<span class="badge">${nUp}</span>`;
     if (id === 'inscrits' && nIns) b = `<span class="badge">${nIns}</span>`;
     return `<button class="${id === tab ? 'on' : ''}" onclick="showTab('${id}')">${lbl}${b}</button>`;
   }).join('');
   $('#fab').hidden = !(tab === 'leads' && !formOpen);
   const V = { today: vToday, leads: vLeads, calls: vCalls, chiffres: vChiffres, inscrits: vInscrits };
   $('#main').innerHTML = V[tab]();
-  if (!modal) { $('#runner').hidden = !runner; if (runner) renderRunner(); }
 }
+function showModal() { $('#runner').hidden = false; }
+function closeModal() { modal = null; F = null; fillQueue = null; runner = null; $('#runner').hidden = true; $('#runner').innerHTML = ''; render(); }
 
 // ================= AUJOURD'HUI =================
 function kpiTiles() {
-  const c = cfg(), t = TODAY(), m = monthKey(t);
-  const st = monthStats(m);
-  const day = Number(t.slice(8, 10)), dim = new Date(Number(t.slice(0, 4)), Number(t.slice(5, 7)), 0).getDate();
-  const objCa = Number(c.objectif_ca) || 0, objV = Number(c.objectif_ventes) || 0;
-  const expected = objCa * day / dim;
-  const proj = day > 1 ? Math.round(st.ca / day * dim) : st.ca;
-  const show = st.shows.length + st.noshow.length ? Math.round(100 * st.shows.length / (st.shows.length + st.noshow.length)) : null;
-  const clos = st.shows.length ? Math.round(100 * st.ventes.length / st.shows.length) : null;
-  const col = (v, g, o) => v === null ? '' : v >= g ? 'g' : v >= o ? 'o' : 'r';
+  const c = cfg(), t = TODAY(), cur = curKey(), p = perKey();
+  const st = stats(perRange(p));
+  const pr = prevRange(p), ps = pr ? stats(pr) : null;
+  const isCur = p === cur, isMonth = p !== 'all';
+  const day = Number(t.slice(8, 10)), dim = dimOf(cur);
+  const objCa = isMonth ? Number(c.objectif_ca) || 0 : 0, objV = isMonth ? Number(c.objectif_ventes) || 0 : 0;
+  const frac = isCur ? day / dim : 1;
+  const proj = isCur && day > 1 ? Math.round(st.ca / day * dim) : st.ca;
+  const col = (v, g, o) => v === null ? 'm' : v >= g ? 'g' : v >= o ? 'o' : 'r';
   const bar = (v, max) => max ? `<div class="bar"><i style="width:${Math.min(100, Math.round(100 * v / max))}%"></i></div>` : '';
-  return { st, show, clos, objCa, expected, html: `<div class="kpis k4">
-    <div class="kpi"><div class="v ${objCa ? (st.ca >= expected ? 'g' : 'o') : ''}">${euro(st.ca)}</div><div class="l">CA signé · ${monthLabel(m).split(' ')[0]}</div>${bar(st.ca, objCa)}<div class="s">${objCa ? 'objectif ' + euro(objCa) + ' · projection ' + euro(proj) : '<a href="#" onclick="openSettings();return false">fixer un objectif</a>'}</div></div>
-    <div class="kpi"><div class="v ${objV ? (st.ventes.length >= objV * day / dim ? 'g' : 'o') : 'g'}">${st.ventes.length}${objV ? '<small> / ' + objV + '</small>' : ''}</div><div class="l">Ventes</div>${bar(st.ventes.length, objV)}<div class="s">${st.shows.length} call${st.shows.length > 1 ? 's' : ''} tenu${st.shows.length > 1 ? 's' : ''}</div></div>
-    <div class="kpi"><div class="v ${col(show, 70, 55)}">${show === null ? '–' : show + ' %'}</div><div class="l">Show-up</div><div class="s">${st.noshow.length} no-show${st.blank.length ? ' · ' + st.blank.length + ' non rempli' + (st.blank.length > 1 ? 's' : '') : ''}</div></div>
-    <div class="kpi"><div class="v ${col(clos, 25, 15)}">${clos === null ? '–' : clos + ' %'}</div><div class="l">Closing</div><div class="s">ventes / calls tenus</div></div>
-  </div>` };
+  const vs = ps ? (isCur ? ' vs même date ' + moisNom(monthShift(cur, -1)).toLowerCase() : ' vs ' + moisNom(monthShift(p, -1)).toLowerCase()) : '';
+  const caSub = objCa ? `objectif ${euro(objCa)}${isCur ? ' · projection ' + euro(proj) : ''}` : isCur ? `<a href="#" onclick="event.stopPropagation();openSettings();return false">fixer un objectif</a>` : `encaissé ${euro(st.cash)}`;
+  const blank = st.blank.length ? ` · <a href="#" onclick="event.stopPropagation();goCalls('todo');return false">${st.blank.length} non rempli${st.blank.length > 1 ? 's' : ''}</a>` : '';
+  const d = ps ? [delta(st.ca, ps.ca, 'eur'), delta(st.ventes.length, ps.ventes.length), delta(st.show, ps.show, 'rate'), delta(st.closing, ps.closing, 'rate')] : ['', '', '', ''];
+  return `<div class="kpis k4">
+    <div class="kpi click" onclick="showTab('chiffres')"><div class="v ${objCa ? (st.ca >= objCa * frac ? 'g' : 'o') : ''}">${euro(st.ca)}</div><div class="l">CA signé · ${esc(perLabel(p))}</div>${bar(st.ca, objCa)}<div class="s">${caSub}${d[0]}</div></div>
+    <div class="kpi click" onclick="goCalls('vendu')"><div class="v ${objV ? (st.ventes.length >= objV * frac ? 'g' : 'o') : 'g'}">${st.ventes.length}${objV ? '<small> / ' + objV + '</small>' : ''}</div><div class="l">Ventes</div>${bar(st.ventes.length, objV)}<div class="s">${plural(st.tenus.length, 'call tenu', 'calls tenus')}${d[1]}</div></div>
+    <div class="kpi click" onclick="goCalls('noshow')"><div class="v ${col(st.show, 0.7, 0.55)}">${pc(st.show)}</div><div class="l">Show-up</div><div class="s">${plural(st.noshow.length, 'no-show')}${blank}${d[2]}</div></div>
+    <div class="kpi click" onclick="goCalls('followup')"><div class="v ${col(st.closing, 0.25, 0.15)}">${pc(st.closing)}</div><div class="l">Closing</div><div class="s">ventes / calls tenus${st.pitches.length && st.nq.length ? ' · ' + pc(st.closingP) + ' sur pitchés' : ''}${d[3]}</div></div>
+  </div>${vs && d.some(Boolean) ? `<div class="count-line">Flèches${esc(vs)}</div>` : ''}`;
 }
-function goulot(k) {
-  const tf = toFill().length, rl = relances().length, up7 = upcoming().filter(l => l.call_at.slice(0, 10) <= addDays(TODAY(), 7)).length;
-  if (tf) return ['r', `${tf} call${tf > 1 ? 's' : ''} sans résultat`, 'Remplis-les en 1 clic plus bas (venu, vendu, follow-up, perdu). Sans ça, les chiffres et les relances sont faux.'];
-  if (rl >= 5) return ['r', `${rl} relances en attente`, 'Lance « Envoyer un par un » : un message, suivant, 5 minutes pour tout vider.'];
-  if (k.show !== null && k.show < 60 && k.st.shows.length + k.st.noshow.length >= 4) return ['o', `Show-up à ${k.show} %`, 'Confirme chaque call la veille et le matin même (bouton Confirmer). Un no-show se recale le jour même.'];
-  if (k.clos !== null && k.clos < 20 && k.st.shows.length >= 5) return ['o', `Closing à ${k.clos} %`, 'Regarde les objections dans Chiffres et relance tous les follow-ups à J+1, J+3, J+7.'];
-  if (up7 < 3) return ['o', `Seulement ${up7} call${up7 > 1 ? 's' : ''} sur 7 jours`, `Réactive les anciens leads (${reactivables().length} à contacter) et les inscrits au live sans fiche.`];
-  if (k.objCa && k.st.ca < k.expected) return ['o', 'En retard sur l\'objectif du mois', `Il manque ${euro(k.expected - k.st.ca)} au rythme prévu : priorité aux follow-ups chauds.`];
-  return ['g', 'Rien ne coince', 'Garde le rythme : confirmer, remplir, relancer.'];
+function goulot() {
+  const st = stats(perRange(curKey()));
+  const tf = toFill().length, rl = relances().length, up7 = upcoming().filter(c => isSale(c) && c.call_at.slice(0, 10) <= addDays(TODAY(), 7)).length;
+  const dues = duePayments();
+  if (tf) return ['r', `${plural(tf, 'call')} sans résultat`, 'Remplis-les maintenant, 1 minute par call : sans ça, les chiffres et les relances sont faux.', `<button class="btn sm" onclick="startFill()">Remplir un par un</button>`];
+  if (dues.length) return ['r', `${euro(dues.reduce((s, x) => s + x.p.next, 0))} d'échéances à encaisser`, `${plural(dues.length, 'paiement')} en retard : relance aujourd'hui, c'est du cash déjà signé.`, ''];
+  if (rl >= 5) return ['r', `${rl} relances en attente`, 'Lance « Envoyer un par un » : un message, suivant, 5 minutes pour tout vider.', `<button class="btn sm" onclick="startRunner('rel')">Envoyer un par un</button>`];
+  if (st.show !== null && st.tenus.length + st.noshow.length >= 4 && st.show < 0.6) return ['o', `Show-up à ${pc(st.show)}`, 'Confirme chaque call la veille et 1 h avant, note sa réponse, et recale un no-show le jour même.', ''];
+  if (st.closing !== null && st.tenus.length >= 5 && st.closing < 0.2) return ['o', `Closing à ${pc(st.closing)}`, "Regarde les objections dans Chiffres : chaque relance follow-up reprend l'objection du call.", ''];
+  if (up7 < 3) return ['o', `Seulement ${plural(up7, 'call')} sur 7 jours`, `Réactive les anciens leads (${reactivables().length} à contacter) et les inscrits au live sans fiche.`, reactivables().length ? `<button class="btn sm" onclick="startRunner('react')">Réactiver un par un</button>` : ''];
+  const obj = Number(cfg().objectif_ca) || 0, day = Number(TODAY().slice(8, 10)), dim = dimOf(curKey());
+  if (obj && st.ca < obj * day / dim) return ['o', "En retard sur l'objectif du mois", `Il manque ${euro(obj * day / dim - st.ca)} au rythme prévu : priorité aux follow-ups chauds.`, ''];
+  return ['g', 'Rien ne coince', 'Garde le rythme : confirmer, remplir, relancer.', ''];
+}
+function planMois() {
+  const c = cfg(), obj = Number(c.objectif_ca) || 0, cur = curKey();
+  if (!obj) return `<div class="plan row2"><span>Fixe l'objectif de CA du mois : la console calcule combien de calls il faut booker pour l'atteindre.</span><button class="btn sec2 sm" onclick="openSettings()">Fixer</button></div>`;
+  const st = stats(perRange(cur));
+  const reste = obj - st.ca;
+  if (reste <= 0) return `<div class="plan"><b>Objectif du mois atteint</b><span>${euro(st.ca)} signés pour ${euro(obj)} visés.</span></div>`;
+  const r = planRates();
+  if (!r.panier) return `<div class="plan row2"><span>Ajoute le prix de l'offre dans les réglages pour avoir le plan du mois.</span><button class="btn sec2 sm" onclick="openSettings()">Réglages</button></div>`;
+  const ventes = Math.ceil(reste / r.panier), tenus = Math.ceil(ventes / r.closing), bookes = Math.ceil(tenus / r.show);
+  const prevus = upcoming().filter(x => isSale(x) && x.call_at.slice(0, 7) === cur).length;
+  const jours = dimOf(cur) - Number(TODAY().slice(8, 10)) + 1;
+  const fu = S.leads.filter(l => l.status === 'followup');
+  return `<div class="plan"><b>Plan pour ${euro(obj)} ce mois-ci</b>
+    <span>Il manque ${euro(reste)} : ${plural(ventes, 'vente')} ≈ ${plural(tenus, 'call tenu', 'calls tenus')} ≈ ${plural(bookes, 'call booké', 'calls bookés')}. ${plural(prevus, 'call déjà prévu', 'calls déjà prévus')}, ${Math.max(0, bookes - prevus)} à trouver en ${plural(jours, 'jour')}.${fu.length ? ` ${plural(fu.length, 'follow-up ouvert', 'follow-ups ouverts')} à closer en priorité.` : ''}</span>
+    <span class="hint">Calcul : panier ${euro(r.panier)}, show-up ${pc(r.show)}, closing ${pc(r.closing)} (${r.real ? '90 derniers jours' : 'taux visés des réglages'}).</span></div>`;
 }
 function vToday() {
   const t = TODAY(), tm = addDays(t, 1);
-  const k = kpiTiles();
-  const [gc, gt, gd] = goulot(k);
-  const fill = toFill(), rel = relances(), today = callsOn(t), tomorrow = callsOn(tm).filter(l => !l.confirmed), react = reactivables(), ins = inscritsSansFiche();
+  const [gc, gt, gd, gb] = goulot();
+  const fill = toFill(), rel = relances(), up = upcoming();
+  const today = up.filter(c => c.call_at.slice(0, 10) === t), tomorrow = up.filter(c => c.call_at.slice(0, 10) === tm && c.conf_reply !== 'ok');
+  const react = reactivables(), ins = inscritsSansFiche(), dues = duePayments(), ob = oublies();
+  const fu = S.leads.filter(l => l.status === 'followup'), fuVal = sumOf(fu, 'price');
   let html = `<div class="hello"><div class="d">${fmtDate(t, { weekday: 'long', day: 'numeric', month: 'long' })}</div><button class="icon" title="Réglages" onclick="openSettings()">⚙</button></div>
-    ${k.html}
-    <div class="goulot ${gc}"><b>${gt}</b><span>${gd}</span></div>`;
-  if (fill.length) html += `<div class="sec late">À remplir <span class="n">${fill.length}</span></div>` + fill.map(l => todoCard(l, 'fill')).join('');
-  if (today.length) html += `<div class="sec">Calls aujourd'hui <span class="n">${today.length}</span></div>` + today.map(l => todoCard(l, 'call')).join('');
-  if (rel.length) html += `<div class="sec ${rel.some(l => l.next_at < t) ? 'late' : ''}">Relances <span class="n">${rel.length}</span><button class="btn sm" onclick="startRunner('rel')">Envoyer un par un</button></div>` + rel.map(l => todoCard(l, 'rel')).join('');
-  if (tomorrow.length) html += `<div class="sec">Demain · à confirmer <span class="n">${tomorrow.length}</span></div>` + tomorrow.map(l => todoCard(l, 'call')).join('');
-  if (!fill.length && !rel.length && !today.length && !tomorrow.length) html += `<div class="card"><div class="empty"><div class="big">Tout est à jour</div>Aucun call à remplir, aucune relance due.</div></div>`;
+    ${periodBar()}${kpiTiles()}
+    <div class="goulot ${gc}"><b>${gt}</b><span>${gd}</span>${gb ? `<div class="gbtn">${gb}</div>` : ''}</div>
+    ${planMois()}`;
+  if (fill.length) html += `<div class="sec late">À remplir <span class="n">${fill.length}</span></div>` + fill.map(fillCard).join('');
+  if (today.length) html += `<div class="sec">Calls aujourd'hui <span class="n">${today.length}</span></div>` + today.map(c => upCard(c)).join('');
+  if (rel.length) html += `<div class="sec ${rel.some(l => l.next_at < t) ? 'late' : ''}">Relances <span class="n">${rel.length}</span><button class="btn sm" onclick="startRunner('rel')">Envoyer un par un</button></div>${fu.length ? `<div class="count-line">${plural(fu.length, 'follow-up ouvert', 'follow-ups ouverts')}${fuVal ? ' · ' + euro(fuVal) + ' sur la table' : ''}</div>` : ''}` + rel.map(relCard).join('');
+  if (tomorrow.length) html += `<div class="sec">Demain · à confirmer <span class="n">${tomorrow.length}</span></div>` + tomorrow.map(c => upCard(c)).join('');
+  if (dues.length) html += `<div class="sec late">Encaissements à relancer <span class="n">${dues.length}</span></div><div class="card">${dues.map(x => payRow(x.l, x.p)).join('')}</div>`;
+  if (!fill.length && !rel.length && !today.length && !tomorrow.length && !dues.length) html += `<div class="card"><div class="empty"><div class="big">Tout est à jour</div>Aucun call à remplir, aucune relance due.</div></div>`;
+  const nOb = ob.nonext.length + ob.nophone.length + ob.noamount.length;
+  if (nOb) {
+    html += `<div class="sec">À vérifier <span class="n">${nOb}</span></div><div class="card fill-agenda">`;
+    if (ob.nonext.length) html += `<div class="fa-row"><div><b>${plural(ob.nonext.length, 'lead en cours', 'leads en cours')} sans prochaine action</b><span class="hint">Personne ne les relancera : date une relance ou clos-les</span></div><button class="btn sec2 sm" onclick="goLeads('nonext')">Voir</button></div>`;
+    if (ob.nophone.length) html += `<div class="fa-row"><div><b>${plural(ob.nophone.length, 'lead en cours', 'leads en cours')} sans numéro</b><span class="hint">Impossible de confirmer ou relancer sur WhatsApp</span></div><button class="btn sec2 sm" onclick="goLeads('nophone')">Voir</button></div>`;
+    if (ob.noamount.length) html += `<div class="fa-row"><div><b>${plural(ob.noamount.length, 'vente')} sans montant</b><span class="hint">Le CA et le panier moyen sont faux sans le montant</span></div><button class="btn sec2 sm" onclick="goLeads('noamount')">Voir</button></div>`;
+    html += `</div>`;
+  }
   if (ins.length || react.length) {
     html += `<div class="sec">Remplir l'agenda</div><div class="card fill-agenda">`;
-    if (ins.length) html += `<div class="fa-row"><div><b>${ins.length} inscrit${ins.length > 1 ? 's' : ''} au live sans fiche</b><span class="hint">Leur proposer un appel avec Lucas</span></div><button class="btn sec2 sm" onclick="showTab('inscrits')">Voir</button></div>`;
-    if (react.length) html += `<div class="fa-row"><div><b>${react.length} anciens leads à réactiver</b><span class="hint">Follow-ups, no-shows et calls sans suite de plus de 45 j</span></div><button class="btn sec2 sm" onclick="startRunner('react')">Un par un</button></div>`;
+    if (ins.length) html += `<div class="fa-row"><div><b>${plural(ins.length, 'inscrit')} au live sans fiche</b><span class="hint">Leur proposer un appel avec Lucas</span></div><button class="btn sec2 sm" onclick="showTab('inscrits')">Voir</button></div>`;
+    if (react.length) html += `<div class="fa-row"><div><b>${plural(react.length, 'ancien lead', 'anciens leads')} à réactiver</b><span class="hint">Follow-ups, no-shows et calls sans suite de plus de 45 j, un message adapté à chacun</span></div><button class="btn sec2 sm" onclick="startRunner('react')">Un par un</button></div>`;
     html += `</div>`;
   }
   html += `<div class="foot hint">${icSync ? 'iClosed synchronisé à ' + fmtTime(icSync) : 'iClosed pas encore synchronisé'} · <a href="#" onclick="syncIclosed(true);return false">${icBusy ? 'synchro…' : 'synchroniser'}</a>${tgOn ? ' · alertes Telegram actives' : ''}</div>`;
   return html;
 }
-function todoCard(l, mode) {
+function goCalls(f) { setPref('cView', 'passes'); setPref('cFilter', f); setPref('cKind', 'ventes'); callSearch = ''; callsLimit = 60; showTab('calls'); }
+function goLeads(f) { filter = f; search = ''; leadsLimit = 120; showTab('leads'); }
+function chipsFor(c, l, extra) {
+  const ch = [];
+  ch.push(`<span class="chip ${cKind(c) === 'client' ? '' : 'mono'}">${kindLabel(cKind(c))}</span>`);
+  if (c.event && c.event !== 'Ajouté dans la console') ch.push(`<span class="chip">${esc(c.event)}</span>`);
+  if (l && l.source) ch.push(`<span class="chip">${esc(srcLabel(l.source))}</span>`);
+  const sc = c.score !== '' ? c.score : (l ? l.score : '');
+  if (sc !== '') ch.push(`<span class="chip ${sc >= 7 ? 'v' : sc <= 4 ? 'r' : 'o'}">${sc}/10</span>`);
+  return ch.concat(extra || []).join('');
+}
+function fillCard(c) {
+  const l = IX.lead[c.lead_id];
+  const phone = l && phoneDigits(l.phone);
+  return `<div class="card todo" id="fill-${c.id}">
+    <div class="t-head"><div><div class="name">${esc(c.name || (l && l.name)) || 'Sans nom'}</div><div class="when hint">Call ${esc(fmtDT(c.call_at))} · ${ago(c.call_at)}</div></div>${l ? `<button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button>` : ''}</div>
+    <div class="chips">${chipsFor(c, l)}</div>
+    <div class="actions"><button class="btn sm" onclick="openCall('${c.id}')">Remplir le résultat</button><button class="btn sm sec2" onclick="quickShow('${c.id}','noshow')">No-show</button>${phone ? '' : '<span class="hint q">pas de numéro</span>'}</div></div>`;
+}
+function confRow(c) {
+  if (!isSale(c)) return '';
+  const r = c.conf_reply;
+  const b = (v, lb, cls) => `<button class="${r === v ? 'on ' + cls : ''}" onclick="confReply('${c.id}','${v}')">${lb}</button>`;
+  return `<div class="conf"><span class="hint">${c.conf_sent ? 'Message envoyé ' + (c.conf_sent.slice(0, 10) === TODAY() ? "aujourd'hui " + fmtTime(c.conf_sent) : fmtDate(c.conf_sent)) + ' · sa réponse :' : 'Sa réponse :'}</span>${b('ok', 'Confirmé', '')}${b('decale', 'Veut décaler', 'o')}${b('rien', 'Pas de réponse', 'm')}</div>`;
+}
+function confReply(id, v) {
+  const c = callById(id); if (!c) return;
+  const nv = c.conf_reply === v ? '' : v;
+  setCall(c, { conf_reply: nv });
+  if (nv === 'decale') toast('Envoie-lui le lien pour recaler (bouton WhatsApp de la fiche)');
+}
+function upCard(c) {
+  const l = IX.lead[c.lead_id];
+  const phone = l && phoneDigits(l.phone);
+  const soon = plusMin(nowLocal(), 120) >= c.call_at;
+  const chips = [`<span class="chip o">${c.call_at.slice(0, 10) === TODAY() ? fmtTime(c.call_at) : esc(fmtDT(c.call_at))}</span>`];
+  if (c.conf_reply === 'ok') chips.push('<span class="chip v">Confirmé</span>');
+  else if (c.conf_reply === 'decale') chips.push('<span class="chip o">Veut décaler</span>');
+  else if (isSale(c)) chips.push(`<span class="chip r">${c.conf_sent ? 'Pas encore de réponse' : 'Pas confirmé'}</span>`);
+  const prev = l ? callsOfLead(l.id).filter(x => x.id !== c.id && x.call_at < c.call_at && x.show).pop() : null;
+  const prep = [l && l.need ? esc(l.need) : '', prev ? `Call précédent (${esc(fmtDate(prev.call_at))}) : ${esc(resLabel(prev))}${prev.objection ? ' · ' + esc(prev.objection) : ''}${prev.notes ? '\n' + esc(prev.notes) : ''}` : ''].filter(Boolean).join('\n');
+  return `<div class="card todo">
+    <div class="t-head"><div><div class="name">${esc(c.name || (l && l.name)) || 'Sans nom'}</div></div>${l ? `<button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button>` : ''}</div>
+    <div class="chips">${chips.join('')}${chipsFor(c, l)}</div>${prep ? `<div class="need open">${prep}</div>` : ''}
+    ${confRow(c)}
+    <div class="actions">${phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}','${soon ? 'rappel' : 'confirm'}',null,'${c.id}')">${soon ? 'Rappel 1 h avant' : c.conf_sent ? 'Relancer la confirmation' : 'Confirmer'}</button>` : '<span class="hint q">pas de numéro</span>'}${l && l.ic_link ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}<button class="btn ghost sm" onclick="openCall('${c.id}')">Résultat</button></div></div>`;
+}
+function relCard(l) {
   const t = TODAY();
   const phone = !!phoneDigits(l.phone);
-  const chips = [];
-  if (l.call_at) chips.push(`<span class="chip ${l.call_at.slice(0, 10) >= t ? 'o' : ''}">${mode === 'call' ? fmtTime(l.call_at) : 'Call ' + fmtDT(l.call_at)}</span>`);
-  if (l.ic_event) chips.push(`<span class="chip">${esc(l.ic_event)}</span>`);
-  if (mode === 'rel') {
-    const late = daysBetween(l.next_at, t);
-    chips.push(`<span class="chip ${late > 0 ? 'r' : 'o'}">${late > 0 ? 'en retard de ' + late + ' j' : "aujourd'hui"}</span>`);
-    if (l.touches) chips.push(`<span class="chip mono">${l.touches} relance${l.touches > 1 ? 's' : ''}${l.last_touch ? ' · ' + ago(l.last_touch) : ''}</span>`);
-  }
-  if (mode === 'call') chips.push(l.confirmed ? `<span class="chip v">Confirmé</span>` : `<span class="chip r">Pas confirmé</span>`);
-  if (l.score !== '') chips.push(`<span class="chip ${l.score >= 7 ? 'v' : 'o'}">${l.score}/10</span>`);
-  let actions = '';
-  if (mode === 'fill') actions = `<span class="hint q">Résultat :</span><button class="btn sm" onclick="setResult('${l.id}','vendu')">Vendu</button><button class="btn sm or" onclick="setResult('${l.id}','followup')">Follow-up</button><button class="btn sm sec2" onclick="setResult('${l.id}','noshow')">No-show</button><button class="btn sm danger" onclick="setResult('${l.id}','perdu')">Perdu</button>`;
-  if (mode === 'call') actions = `${phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}','confirm')">${l.confirmed ? 'Reconfirmer' : 'Confirmer'}</button>` : ''}${l.ic_link ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}`;
-  if (mode === 'rel') actions = `${phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp</button>` : `<span class="hint q">pas de numéro</span>`}<button class="btn sm sec2" onclick="snooze('${l.id}',2)">+2 j</button><button class="btn sm sec2" onclick="setResult('${l.id}','booke')">Rebooké</button><button class="btn sm danger" onclick="setResult('${l.id}','perdu')">Perdu</button>`;
-  const prep = mode === 'call' && l.need ? `<div class="need open">${esc(l.need)}</div>` : '';
+  const late = daysBetween(l.next_at, t);
+  const last = callsOfLead(l.id).filter(c => c.show).pop();
+  const chips = [`<span class="chip ${late > 0 ? 'r' : 'o'}">${late > 0 ? 'en retard de ' + late + ' j' : "aujourd'hui"}</span>`];
+  if (l.touches) chips.push(`<span class="chip mono">${plural(l.touches, 'relance')}${l.last_touch ? ' · ' + ago(l.last_touch) : ''}</span>`);
+  if (l.temp) chips.push(`<span class="chip ${l.temp === 'chaud' ? 'v' : l.temp === 'tiede' ? 'o' : ''}">${esc((TEMPS.find(x => x[0] === l.temp) || [, l.temp])[1])}</span>`);
+  if (l.price && l.status === 'followup') chips.push(`<span class="chip mono">${euro(l.price)}</span>`);
+  if (l.objection) chips.push(`<span class="chip">${esc(l.objection)}</span>`);
+  const k = kindOf(l);
   return `<div class="card todo" id="todo-${l.id}">
-    <div class="t-head"><div><div class="name">${esc(l.name) || 'Sans nom'}</div>${mode === 'rel' ? `<div class="next"><b>${esc(stLabel(l.status))}</b><span>${esc(l.next_action || 'Relance')}</span></div>` : ''}</div><button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button></div>
-    <div class="chips">${chips.join('')}</div>${prep}
-    <div class="actions">${actions}</div></div>`;
+    <div class="t-head"><div><div class="name">${esc(l.name) || 'Sans nom'}</div><div class="next"><b>${esc(stLabel(l.status))}</b><span>${esc(l.next_action || 'Relance')}</span></div></div><button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button></div>
+    <div class="chips">${chips.join('')}</div>
+    ${last ? `<div class="recap">Dernier call ${esc(fmtDate(last.call_at))} : ${esc(resLabel(last))}${last.reason ? ' · ' + esc(last.reason) : last.notes ? ' · ' + esc(last.notes) : ''}</div>` : ''}
+    <div class="actions">${phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp · ${esc(tplShort(k))}</button>` : `<span class="hint q">pas de numéro</span><button class="btn sm sec2" onclick="touched('${l.id}')">Relance faite</button>`}<button class="btn sm sec2" onclick="snooze('${l.id}',2)">+2 j</button><button class="btn sm sec2" onclick="rebook('${l.id}')">Rebooké</button><button class="btn sm danger" onclick="closeLead('${l.id}')">Perdu</button></div></div>`;
+}
+const TPL_SHORT = { confirm: 'confirmation', rappel: 'rappel 1 h avant', noshow: 'recaler', relance: 'recaler', followup: 'relance 1', followup2: 'relance 2', followup3: 'relance 3', followup_fin: 'dernière relance', reactivation: 'réactivation', reactivation_ns: 'réactivation', live: 'proposer un appel' };
+function tplShort(k) { return TPL_SHORT[k] || k; }
+function snooze(id, n) { patch(id, { next_at: addDays(TODAY(), n) }); toast('Reporté au ' + fmtDate(addDays(TODAY(), n))); }
+function rebook(id) {
+  const l = IX.lead[id]; if (!l) return;
+  const at = prompt(`Nouveau call de ${firstName(l.name) || 'ce lead'} : date et heure (JJ/MM HHhMM), ou laisse vide si la réservation arrive par iClosed`, '');
+  if (at === null) return;
+  const m = at.trim().match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s+(\d{1,2})[h:](\d{2})?$/i);
+  if (at.trim() && !m) { toast('Format : 22/09 14h30', true); return; }
+  if (m) {
+    const y = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : TODAY().slice(0, 4);
+    const iso = `${y}-${pad(m[2])}-${pad(m[1])}T${pad(m[4])}:${pad(m[5] || '00')}`;
+    addCallFor(id, iso, 'r1');
+    toast('Call ajouté le ' + fmtDT(iso));
+    render();
+  } else { patch(id, { status: 'booke', next_at: '', next_action: '' }); toast('Passé en call booké'); }
+}
+function closeLead(id) { patch(id, { status: 'perdu', next_at: '', next_action: '' }); toast('Clos en perdu'); }
+function payRow(l, p) {
+  return `<div class="pay"><div><div class="n" onclick="goLead('${l.id}')">${esc(l.name)}</div><div class="d ${p && p.late && p.rest ? 'late' : ''}">${p ? (p.rest ? `Échéance ${p.done + 1}/${p.n} · ${euro(p.next)} ${p.late ? 'attendue depuis le ' : 'prévue le '}${fmtDate(p.due, { day: 'numeric', month: 'long' })}` : 'Tout encaissé') : `Reste ${euro((Number(l.price) || 0) - (Number(l.paid) || 0))}`} · encaissé ${euro(l.paid)} / ${euro(l.price)}</div></div>
+    <div class="actions" style="margin:0;flex:none">${phoneDigits(l.phone) ? `<a class="btn wa sm" href="https://wa.me/${phoneDigits(l.phone)}" target="lucas-wa">WhatsApp</a>` : ''}<button class="btn sm" onclick="cashIn('${l.id}')">Reçu</button></div></div>`;
 }
 
-// ================= ENVOI UN PAR UN =================
+// ---------- messages WhatsApp ----------
+function kindOf(l) {
+  const nxt = nextCallOf(l.id);
+  if (nxt) return plusMin(nowLocal(), 120) >= nxt.call_at ? 'rappel' : 'confirm';
+  if (l.status === 'noshow') return 'noshow';
+  if (l.status === 'followup' || l.status === 'fait') { const n = Number(l.touches) || 0; return n <= 0 ? 'followup' : n === 1 ? 'followup2' : n === 2 ? 'followup3' : 'followup_fin'; }
+  if (l.status === 'ancien' || /réactiv/i.test(l.next_action)) return reactKind(l);
+  if (/live/.test(l.source) && !callsOfLead(l.id).length) return 'live';
+  return 'relance';
+}
+function objList(s) { return String(s || '').split(/\s*·\s*/).map(x => x.trim()).filter(Boolean); }
+function objFamily(s) {
+  const x = String(s || '').trim(); if (!x) return '';
+  const exact = OBJECTIONS.find(o => o[0].toLowerCase() === x.toLowerCase()) || DISQUALIF.find(o => o.toLowerCase() === x.toLowerCase());
+  if (exact) return Array.isArray(exact) ? exact[0] : exact;
+  const n = x.toLowerCase();
+  if (/cher|prix|tarif/.test(n)) return 'Trop cher';
+  if (/argent|budget|moyens|financ/.test(n)) return "Pas l'argent en ce moment";
+  if (/conjoint|associ|femme|mari|épou|epou|parler/.test(n)) return 'Doit en parler (conjoint / associé)';
+  if (/réfléchi|reflechi/.test(n)) return 'Veut réfléchir';
+  if (/timing|moment|temps|tard/.test(n)) return 'Pas le bon moment';
+  if (/peur|légitim|legitim|capable/.test(n)) return 'Peur de ne pas y arriver';
+  if (/confiance|preuve|arnaque/.test(n)) return "Pas confiance en l'offre";
+  if (/seul|lui-même|autonom/.test(n)) return 'Veut le faire seul';
+  if (/besoin/.test(n)) return 'Ne voit pas le besoin';
+  return x.charAt(0).toUpperCase() + x.slice(1);
+}
+function objPhrase(l) {
+  for (const o of objList(l.objection).map(objFamily)) { const f = OBJECTIONS.find(x => x[0] === o); if (f && f[1]) return 'Pendant ton appel avec Lucas, ' + f[1] + '.'; }
+  return '';
+}
+function msgFor(l, kind, call) {
+  const c = cfg();
+  let m = c.tpl[kind || kindOf(l)] || '';
+  const nxt = call || nextCallOf(l.id);
+  const visio = l.ic_link || '';
+  const op = objPhrase(l);
+  const drop = tok => { m = m.split('\n').filter(x => !x.includes(tok)).join('\n'); };
+  if (!visio) drop('{visio}');
+  if (!op) drop('{objection}');
+  return m.replace(/\{prenom\}/g, firstName(l.name)).replace(/\{quand\}/g, quand(nxt ? nxt.call_at : l.call_at)).replace(/\{visio\}/g, visio).replace(/\{objection\}/g, op)
+    .replace(/\{iclosed\}/g, c.iclosed).replace(/\{signature\}/g, c.signature || 'Alex').replace(/ {2,}/g, ' ').trim();
+}
+function waUrl(l, text) { const d = phoneDigits(l.phone); return d ? `https://wa.me/${d}?text=${encodeURIComponent(text)}` : ''; }
+// ouvre WhatsApp (toujours le même onglet) et enregistre ce qui a été fait
+function sendWa(id, kind, customText, callId) {
+  const l = IX.lead[id]; if (!l) return;
+  const k = kind || kindOf(l);
+  const url = waUrl(l, customText || msgFor(l, k, callId ? callById(callId) : null));
+  if (!url) { toast('Pas de numéro sur cette fiche', true); return; }
+  window.open(url, 'lucas-wa');
+  if (k === 'confirm' || k === 'rappel') {
+    const c = callId ? callById(callId) : nextCallOf(id);
+    if (c) { setCall(c, { conf_sent: isoNow() }); toast('Message envoyé : note sa réponse sur la carte'); }
+    return;
+  }
+  touched(id, !!runner);
+}
+function touched(id, silent) {
+  const l = IX.lead[id]; if (!l) return;
+  const n = (Number(l.touches) || 0) + 1, t = TODAY();
+  const ch = { touches: n, last_touch: t };
+  if (l.status === 'ancien') ch.status = 'a_appeler';
+  if (n > STEPS.length) { ch.next_at = addDays(t, 7); ch.next_action = `${n} relances sans suite : passer en perdu ?`; }
+  else { ch.next_at = addDays(t, STEPS[n - 1]); ch.next_action = (l.status === 'ancien' || /réactiv/i.test(l.next_action) ? 'Réactivation' : l.status === 'noshow' ? 'Recaler le call' : l.status === 'followup' ? 'Relance follow-up' : 'Relance') + ' ' + (n + 1); }
+  patch(id, ch, { silent });
+  if (!silent) toast(`Relance ${n} notée · prochaine ${dayLabel(ch.next_at)}`);
+}
+
+// ================= FICHE RÉSULTAT DU CALL =================
+function draftKey(id) { return 'cl_draft:' + id; }
+function fPick() { const o = {}; ['show', 'result', 'score', 'temp', 'offer', 'price', 'payment', 'paid', 'objs', 'obj_other', 'reason', 'next_step', 'next_at', 'new_at', 'recording', 'notes', 'client', 'wa'].forEach(k => { o[k] = F[k]; }); return o; }
+function saveDraft() { if (!F) return; const cur = JSON.stringify(fPick()); if (cur === F._init) lsDel(draftKey(F.id)); else lsSet(draftKey(F.id), JSON.stringify({ at: Date.now(), fa: F._fa, f: fPick() })); }
+function dropDraft(id) { lsDel(draftKey(id)); }
+function openCall(id) {
+  const c = callById(id); if (!c) { toast('Call introuvable', true); return; }
+  const l = IX.lead[c.lead_id] || {};
+  const objs = objList(c.objection);
+  const known = c.result === 'non_qualifie' ? DISQUALIF : OBJECTIONS.map(o => o[0]);
+  F = {
+    id, show: c.show, result: c.result, score: c.score, temp: c.temp || (c.result ? '' : l.temp || ''),
+    offer: c.offer || '', price: c.price, payment: c.payment, paid: c.paid,
+    objs: objs.filter(o => known.includes(o)), obj_other: objs.filter(o => !known.includes(o)).join(' · '),
+    reason: c.reason, next_step: c.next_step, next_at: c.next_at, new_at: '', recording: c.recording, notes: c.notes,
+    client: cKind(c) === 'client', wa: true, err: '',
+  };
+  if (F.obj_other && !F.objs.includes('Autre')) F.objs.push('Autre');
+  F._init = JSON.stringify(fPick());
+  F._fa = c.filled_at;
+  try {
+    const d = JSON.parse(lsGet(draftKey(id)) || 'null');
+    if (d && d.f && Date.now() - d.at < 7 * 864e5 && (d.fa || '') === (c.filled_at || '')) { Object.assign(F, d.f); F._draft = true; }
+    else if (d) lsDel(draftKey(id)); // périmé, ou le call a été rempli entre-temps (autre appareil)
+  } catch (e) { }
+  modal = 'call'; showModal(); renderCallForm(); $('#runner').scrollTop = 0;
+}
+function fSet(k, v) {
+  if (!F) return;
+  const nv = String(F[k]) === String(v) ? '' : v;
+  if (k === 'result') {
+    const grp = x => x === 'non_qualifie' ? 'nq' : 'obj';
+    if (nv && grp(nv) !== grp(F.result || 'followup')) { F.objs = []; F.obj_other = ''; }
+    F.result = nv;
+    if (nv) F.show = 'present';
+    if (nv === 'followup' && !F.next_at) F.next_at = addDays(TODAY(), 1);
+    if (nv === 'vendu' && !F.offer && offers().length === 1) { F.offer = offers()[0].name; if (F.price === '' && offers()[0].price) F.price = offers()[0].price; }
+  } else if (k === 'show') {
+    F.show = nv;
+    if (nv !== 'present') F.result = '';
+  } else if (k === 'score') F.score = nv === '' ? '' : Number(nv);
+  else F[k] = nv;
+  F.err = '';
+  saveDraft(); renderCallForm();
+}
+function fObj(i, list) {
+  const v = list === 'nq' ? DISQUALIF[i] : OBJECTIONS[i][0];
+  F.objs = F.objs.includes(v) ? F.objs.filter(x => x !== v) : F.objs.concat(v);
+  F.err = ''; saveDraft(); renderCallForm();
+}
+function fOffer(i) { const o = offers()[i]; if (!o) return; F.offer = F.offer === o.name ? '' : o.name; if (F.offer && o.price && F.price === '') F.price = o.price; saveDraft(); renderCallForm(); }
+function fVal(k, v) { if (!F) return; F[k] = v; saveDraft(); }
+function fPaid(mode) { const p = num(F.price) || 0; const n = { '2x': 2, '3x': 3, '4x': 4 }[F.payment] || 1; F.paid = mode === 'all' ? p : mode === 'part' ? Math.round(p / n) : 0; saveDraft(); renderCallForm(); }
+function paidQuick() { const p = num(F.price) || 0; const n = { '2x': 2, '3x': 3, '4x': 4 }[F.payment]; return (p ? `<button type="button" onclick="fPaid('all')">Tout (${euro(p)})</button>${n ? `<button type="button" onclick="fPaid('part')">1re échéance (${euro(Math.round(p / n))})</button>` : ''}` : '') + `<button type="button" onclick="fPaid('none')">Rien encore</button>`; }
+function fPrice(v) { if (!F) return; F.price = v; saveDraft(); const q = $('#f-paidq'); if (q) q.innerHTML = paidQuick(); }
+function fDays(n) { F.next_at = addDays(TODAY(), n); saveDraft(); renderCallForm(); }
+function segHtml(k, opts, cls) { return `<div class="seg ${cls || ''}">${opts.map(([v, lb, c]) => `<button type="button" class="${String(F[k]) === String(v) ? 'on ' + (c || '') : ''}" onclick="fSet('${k}','${v}')">${lb}</button>`).join('')}</div>`; }
+function renderCallForm() {
+  if (!F) return;
+  const c = callById(F.id); if (!c) return closeModal();
+  const l = IX.lead[c.lead_id] || {};
+  const box = $('#runner'), sc = box.scrollTop;
+  const q = fillQueue ? ` · ${fillQueue.i + 1} / ${fillQueue.ids.length}` : '';
+  const present = F.show === 'present';
+  const phone = !!phoneDigits(l.phone);
+  const hist = callsOfLead(c.lead_id).filter(x => x.id !== c.id && x.show);
+  let h = `<div class="rn-box form">
+    <div class="rn-top"><b>Résultat du call${q}</b><button class="icon" onclick="closeModal()" aria-label="Fermer">✕</button></div>
+    <div class="name">${esc(c.name || l.name) || 'Sans nom'}</div>
+    <div class="chips"><span class="chip o">${esc(fmtDT(c.call_at))}</span>${chipsFor(c, l)}</div>
+    ${l.need || hist.length ? `<details class="icinfo"><summary>Son questionnaire${hist.length ? ' et ses calls précédents' : ''}</summary><div class="wa-prev">${esc(l.need || '')}${hist.map(x => esc(`\n\n${fmtDT(x.call_at)} · ${resLabel(x)}${x.objection ? ' · ' + x.objection : ''}${x.notes ? '\n' + x.notes : ''}`)).join('')}</div></details>` : ''}
+    ${F._draft ? `<div class="draft">Brouillon récupéré : ta saisie non enregistrée est revenue.<a href="#" onclick="resetForm();return false">Effacer</a></div>` : ''}
+    <span class="lbl">Ce qui s'est passé</span>${segHtml('show', SHOWS)}`;
+  if (F.client) {
+    h += `<p class="hint" style="margin-top:10px">Séance client : hors stats de vente.</p>`;
+  } else if (present) {
+    h += `<span class="lbl">Résultat</span>${segHtml('result', RESULTS)}
+      <span class="lbl">Qualifié /10 <small>le profil colle à l'offre ?</small></span>${segHtml('score', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => [n, n]), 'num')}`;
+    const offs = offers();
+    const offerBlock = (title) => `<span class="lbl">${title}</span>${offs.length ? `<div class="seg small">${offs.map((o, i) => `<button type="button" class="${F.offer === o.name ? 'on' : ''}" onclick="fOffer(${i})">${esc(o.name)}${o.price ? ' · ' + euro(o.price) : ''}</button>`).join('')}</div>` : ''}
+      <div class="grid2"><div><span class="lbl">Offre</span><input class="inp" type="text" value="${esc(F.offer)}" placeholder="Mentorat 90 jours" oninput="fVal('offer',this.value)"></div>
+      <div><span class="lbl">Prix${F.result === 'vendu' ? '' : ' proposé'} (€)</span><input class="inp" type="number" inputmode="numeric" min="0" value="${esc(F.price)}" placeholder="5000" oninput="fPrice(this.value)"></div></div>`;
+    if (F.result === 'vendu') {
+      h += `<div class="zone v">${offerBlock('Offre vendue')}
+        <span class="lbl">Paiement</span>${segHtml('payment', PAYMENTS, 'small')}
+        <span class="lbl">Encaissé aujourd'hui (€)</span><input class="inp" type="number" inputmode="numeric" min="0" value="${esc(F.paid)}" placeholder="0" oninput="fVal('paid',this.value)">
+        <div class="quick" id="f-paidq">${paidQuick()}</div></div>`;
+    }
+    if (F.result === 'followup') {
+      h += `<div class="zone o"><span class="lbl">Température <small>chances de signer</small></span>${segHtml('temp', TEMPS, 'small')}
+        ${offerBlock('Offre proposée')}
+        <span class="lbl">Prochaine étape convenue</span><input class="inp" type="text" value="${esc(F.next_step)}" placeholder="Renvoyer le programme, il revient vers nous jeudi" oninput="fVal('next_step',this.value)">
+        <div class="grid2"><div><span class="lbl">Relance le</span><input class="inp" type="date" value="${esc(F.next_at)}" onchange="fVal('next_at',this.value)">
+          <div class="quick"><button type="button" onclick="fDays(1)">+1 j</button><button type="button" onclick="fDays(2)">+2 j</button><button type="button" onclick="fDays(3)">+3 j</button><button type="button" onclick="fDays(7)">+7 j</button></div></div>
+        <div><span class="lbl">Ou 2e call booké le</span><input class="inp" type="datetime-local" value="${esc(F.new_at)}" onchange="fVal('new_at',this.value)"></div></div></div>`;
+    }
+    if (F.result === 'followup' || F.result === 'perdu') {
+      h += `<span class="lbl">Objections <small>une ou plusieurs</small></span><div class="seg small">${OBJECTIONS.map((o, i) => `<button type="button" class="${F.objs.includes(o[0]) ? 'on o' : ''}" onclick="fObj(${i})">${esc(o[0])}</button>`).join('')}</div>
+        ${F.objs.includes('Autre') ? `<input class="inp" style="margin-top:8px" type="text" value="${esc(F.obj_other)}" placeholder="Laquelle ?" oninput="fVal('obj_other',this.value)">` : ''}
+        <span class="lbl">Pourquoi ça n'a pas signé ? <small>la vraie raison, en une ou deux phrases</small></span><textarea class="inp" placeholder="Ce qui a bloqué, ce qu'on tenterait différemment" oninput="fVal('reason',this.value)">${esc(F.reason)}</textarea>`;
+    }
+    if (F.result === 'non_qualifie') {
+      h += `<span class="lbl">Pourquoi pas qualifié ?</span><div class="seg small">${DISQUALIF.map((o, i) => `<button type="button" class="${F.objs.includes(o) ? 'on m' : ''}" onclick="fObj(${i},'nq')">${esc(o)}</button>`).join('')}</div>
+        ${F.objs.includes('Autre') ? `<input class="inp" style="margin-top:8px" type="text" value="${esc(F.obj_other)}" placeholder="Précise" oninput="fVal('obj_other',this.value)">` : ''}`;
+    }
+    h += `<span class="lbl">Enregistrement du call <small>lien, facultatif</small></span><input class="inp" type="url" value="${esc(F.recording)}" placeholder="https://" oninput="fVal('recording',this.value)">`;
+  } else if (F.show === 'reporte') {
+    h += `<span class="lbl">Nouveau créneau <small>laisse vide s'il n'est pas encore fixé</small></span><input class="inp" type="datetime-local" value="${esc(F.new_at)}" onchange="fVal('new_at',this.value)">`;
+  }
+  if (!F.client && ['noshow', 'reporte', 'annule'].includes(F.show)) {
+    h += `<p class="hint" style="margin-top:10px">Le lead passe en relance aujourd'hui pour recaler le call.</p>${phone ? `<label class="chk"><input type="checkbox" ${F.wa ? 'checked' : ''} onchange="fVal('wa',this.checked)">Ouvrir WhatsApp avec le message pour recaler</label>` : ''}`;
+  }
+  h += `<span class="lbl">Notes du call</span><textarea class="inp" placeholder="Ce qui s'est dit, son contexte, ce qu'il faut retenir" oninput="fVal('notes',this.value)">${esc(F.notes)}</textarea>
+    ${F.err ? `<div class="err-inline">${esc(F.err)}</div>` : ''}
+    <div class="row">${fillQueue ? `<button class="btn ghost sm" onclick="nextFill()">Passer</button>` : `<button class="btn ghost sm" onclick="closeModal()">Annuler</button>`}<button class="btn" onclick="saveCall()">${fillQueue && fillQueue.i < fillQueue.ids.length - 1 ? 'Enregistrer et suivant' : 'Enregistrer'}</button></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><a href="#" class="linkbtn" onclick="fSet('client',${F.client ? "''" : 'true'});return false">${F.client ? "C'est un call de vente" : "C'est une séance client (hors stats)"}</a>${c.id.startsWith('icc') ? '' : `<a href="#" class="linkbtn" onclick="delCall('${c.id}');return false">Supprimer ce call</a>`}</div>
+  </div>`;
+  box.innerHTML = h; box.scrollTop = sc;
+}
+function resetForm() { const id = F.id, q = fillQueue; dropDraft(id); fillQueue = q; openCall(id); }
+function saveCall() {
+  const c = callById(F.id); if (!c) return closeModal();
+  const l = IX.lead[c.lead_id];
+  const fail = m => { F.err = m; renderCallForm(); toast(m, true); };
+  const present = F.show === 'present';
+  const objection = F.objs.map(o => o === 'Autre' && F.obj_other.trim() ? F.obj_other.trim() : o).join(' · ');
+  if (!F.show) return fail("Choisis ce qui s'est passé : présent, no-show, reporté ou annulé");
+  if (present && !F.client) {
+    if (!F.result) return fail('Choisis le résultat du call');
+    if (F.result === 'vendu' && !(num(F.price) > 0)) return fail('Indique le montant de la vente');
+    if (F.result === 'vendu' && !F.payment) return fail('Choisis le mode de paiement');
+    if ((F.result === 'followup' || F.result === 'perdu') && !objection) return fail("Choisis au moins une objection (c'est ce qui nourrit les relances et les chiffres)");
+    if (F.result === 'non_qualifie' && !objection) return fail("Dis pourquoi il n'est pas qualifié");
+    if (F.result === 'followup' && !F.next_at && !F.new_at) return fail('Choisis la date de relance ou du 2e call');
+  }
+  if (F.new_at && F.new_at.slice(0, 16) < nowLocal() && (F.result === 'followup' || F.show === 'reporte')) return fail('Le prochain call doit être dans le futur');
+  const isRes = k => present && !F.client && k.includes(F.result);
+  const f = {
+    kind: F.client ? 'client' : (c.kind === 'client' ? 'r1' : (c.kind || 'r1')),
+    show: F.show,
+    result: present && !F.client ? F.result : '',
+    score: present && !F.client ? num(F.score) : '',
+    temp: isRes(['followup']) ? F.temp : '',
+    offer: isRes(['vendu', 'followup']) ? F.offer.trim() : '',
+    price: isRes(['vendu', 'followup']) ? num(F.price) : '',
+    payment: isRes(['vendu']) ? F.payment : '',
+    paid: isRes(['vendu']) ? num(F.paid) : '',
+    objection: isRes(['followup', 'perdu', 'non_qualifie']) ? objection : '',
+    reason: isRes(['followup', 'perdu']) ? F.reason.trim() : '',
+    next_step: isRes(['followup']) ? F.next_step.trim() : '',
+    next_at: isRes(['followup']) ? F.next_at : '',
+    recording: present ? F.recording.trim() : '',
+    notes: F.notes.trim(),
+  };
+  const wasSale = c.result === 'vendu', prevShow = c.show;
+  commitCall(c, f);
+  const newAt = F.new_at && (F.result === 'followup' || F.show === 'reporte') ? F.new_at : '';
+  if (newAt && l) { addCallFor(l.id, newAt, 'r1'); }
+  dropDraft(c.id);
+  if (!F.client && l && F.wa && F.show !== prevShow && ['noshow', 'reporte', 'annule'].includes(F.show) && !newAt && phoneDigits(l.phone) && l.status !== 'perdu') sendWa(l.id, F.show === 'noshow' ? 'noshow' : 'relance');
+  const msg = F.client ? 'Séance notée' : f.result === 'vendu' ? (wasSale ? 'Vente mise à jour' : 'Vente enregistrée, bravo') : f.result === 'followup' ? (newAt ? '2e call ajouté le ' + fmtDT(newAt) : 'Follow-up : relance ' + dayLabel(f.next_at)) : f.show === 'present' ? 'Résultat enregistré' : newAt ? 'Call recalé le ' + fmtDT(newAt) : "Noté : à recaler aujourd'hui";
+  toast(msg);
+  if (fillQueue) nextFill(); else closeModal();
+}
+function startFill(ids) {
+  const list = ids || toFill().map(c => c.id);
+  if (!list.length) { toast('Aucun call à remplir'); return; }
+  fillQueue = { ids: list, i: 0 };
+  openCall(list[0]);
+}
+function nextFill() {
+  if (!fillQueue) return closeModal();
+  const q = fillQueue;
+  q.i++;
+  while (q.i < q.ids.length) { const c = callById(q.ids[q.i]); if (c && !c.show) { fillQueue = q; return openCall(c.id); } q.i++; }
+  toast('Tous les calls de la liste sont passés');
+  closeModal();
+}
+async function delCall(id) {
+  const c = callById(id); if (!c || id.startsWith('icc')) return;
+  if (!confirm('Supprimer ce call ajouté à la main ?')) return;
+  S.calls = S.calls.filter(x => x.id !== id); dropDraft(id);
+  setQueue(getQueue().filter(op => !(op.what === 'call_upsert' && op.call && op.call.id === id)));
+  lastWrite = Date.now(); reindex(); saveLocal();
+  closeModal();
+  await send({ what: 'call_delete', id });
+  toast('Call supprimé');
+}
+
+// ================= ENVOI WHATSAPP UN PAR UN =================
 function startRunner(kind) {
   const ids = (kind === 'react' ? reactivables() : relances()).filter(l => phoneDigits(l.phone)).map(l => l.id);
   if (!ids.length) { toast('Personne à contacter avec un numéro', true); return; }
-  runner = { kind, title: kind === 'react' ? 'Réactivation' : 'Relances du jour', ids, i: 0, done: 0 };
-  render();
+  runner = { kind, title: kind === 'react' ? 'Réactivation' : 'Relances du jour', ids, i: 0, done: 0, opened: false };
+  modal = 'wa'; showModal(); renderRunner();
 }
 function renderRunner() {
   const r = runner, el = $('#runner');
+  if (!r) return;
   if (r.i >= r.ids.length) {
-    el.innerHTML = `<div class="rn-box"><div class="rn-top"><b>${r.title}</b><button class="icon" onclick="stopRunner()">✕</button></div><div class="empty"><div class="big">Terminé</div>${r.done} message${r.done > 1 ? 's' : ''} envoyé${r.done > 1 ? 's' : ''}. Les prochaines relances sont déjà datées.</div><button class="btn full" onclick="stopRunner()">Fermer</button></div>`;
+    el.innerHTML = `<div class="rn-box"><div class="rn-top"><b>${r.title}</b><button class="icon" onclick="closeModal()">✕</button></div><div class="empty"><div class="big">Terminé</div>${plural(r.done, 'message envoyé', 'messages envoyés')}. Les prochaines relances sont déjà datées.</div><button class="btn full" onclick="closeModal()">Fermer</button></div>`;
     return;
   }
-  const l = S.leads.find(x => x.id === r.ids[r.i]);
+  const l = IX.lead[r.ids[r.i]];
   if (!l) { r.i++; return renderRunner(); }
-  const kind = r.kind === 'react' ? 'reactivation' : kindOf(l);
+  const kind = r.kind === 'react' ? reactKind(l) : kindOf(l);
+  const last = callsOfLead(l.id).filter(c => c.show).pop();
   el.innerHTML = `<div class="rn-box">
-    <div class="rn-top"><b>${r.title} · ${r.i + 1} / ${r.ids.length}</b><button class="icon" onclick="stopRunner()">✕</button></div>
+    <div class="rn-top"><b>${r.title} · ${r.i + 1} / ${r.ids.length}</b><button class="icon" onclick="closeModal()">✕</button></div>
     <div class="bar"><i style="width:${Math.round(100 * r.i / r.ids.length)}%"></i></div>
     <div class="name" style="margin-top:12px">${esc(l.name)}</div>
-    <div class="chips">${l.call_at ? `<span class="chip">Call ${fmtDate(l.call_at, { day: 'numeric', month: 'short', year: 'numeric' })}</span>` : ''}${l.ic_result ? `<span class="chip">${esc(l.ic_result)}</span>` : ''}${l.touches ? `<span class="chip mono">${l.touches} relance${l.touches > 1 ? 's' : ''}</span>` : ''}${l.objection ? `<span class="chip o">${esc(l.objection)}</span>` : ''}</div>
+    <div class="chips">${l.call_at ? `<span class="chip">Call ${esc(fmtDT(l.call_at))}</span>` : ''}${last ? `<span class="chip">${esc(resLabel(last))}</span>` : l.ic_result ? `<span class="chip">${esc(l.ic_result)}</span>` : ''}${l.touches ? `<span class="chip mono">${plural(l.touches, 'relance')}</span>` : ''}${l.objection ? `<span class="chip o">${esc(l.objection)}</span>` : ''}</div>
     ${l.need ? `<div class="need open">${esc(l.need)}</div>` : ''}
-    <span class="lbl">Message (modifiable)</span>
+    <span class="lbl">Message · ${esc(tplShort(kind))} (modifiable)</span>
     <textarea class="inp tall" id="rn-msg">${esc(msgFor(l, kind))}</textarea>
-    <div class="row"><button class="btn ghost sm" onclick="runnerNext(false)">Passer</button><button class="btn wa" onclick="runnerSend('${kind}')">Ouvrir WhatsApp et suivant</button></div>
+    <div class="row" id="rn-act">${runnerButtons()}</div>
   </div>`;
 }
-function runnerSend(kind) {
-  const r = runner, id = r.ids[r.i];
-  sendWa(id, kind, $('#rn-msg').value);
-  r.done++; runnerNext(true);
+function runnerButtons() {
+  const r = runner;
+  return `<button class="btn ghost sm" onclick="runnerNext()">Passer</button><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ${r.opened ? 'sec2' : 'wa'}" onclick="runnerOpen()">${r.opened ? 'Rouvrir WhatsApp' : 'Ouvrir WhatsApp'}</button><button class="btn ${r.opened ? '' : 'sec2'}" onclick="runnerSent()">Envoyé, suivant</button></div>`;
 }
-function runnerNext() { runner.i++; renderRunner(); }
-function stopRunner() { runner = null; modal = false; $('#runner').hidden = true; $('#runner').innerHTML = ''; render(); }
+function runnerOpen() {
+  const r = runner, l = IX.lead[r.ids[r.i]]; if (!l) return;
+  const url = waUrl(l, $('#rn-msg').value);
+  if (!url) { toast('Pas de numéro', true); return; }
+  window.open(url, 'lucas-wa');
+  r.opened = true; $('#rn-act').innerHTML = runnerButtons();
+}
+function runnerSent() { const r = runner; touched(r.ids[r.i], true); r.done++; runnerNext(); }
+function runnerNext() { runner.i++; runner.opened = false; renderRunner(); }
 
 // ================= LEADS =================
-const FILTERS = [['tous', 'En cours'], ['late', 'Relances dues'], ['followup', 'Follow-up'], ['booke', 'Call booké'], ['a_appeler', 'À relancer'], ['noshow', 'No-show'], ['vendu', 'Vendu'], ['perdu', 'Perdu'], ['react', 'À réactiver'], ['ancien', 'Anciens']];
+const FILTERS = [['tous', 'En cours'], ['late', 'Relances dues'], ['followup', 'Follow-up'], ['booke', 'Call booké'], ['a_appeler', 'À relancer'], ['noshow', 'No-show'], ['vendu', 'Vendu'], ['perdu', 'Perdu'], ['react', 'À réactiver'], ['ancien', 'Anciens'], ['ecarte', 'Écartés']];
+const FILTERS_CHECK = [['nonext', 'Sans prochaine action'], ['nophone', 'Sans numéro'], ['noamount', 'Vente sans montant']];
+const SORTS = [['next', 'Tri : prochaine action'], ['call', 'Tri : dernier call'], ['recent', 'Tri : plus récents'], ['score', 'Tri : qualif'], ['price', 'Tri : montant'], ['name', 'Tri : nom']];
 function filterFn(f) {
   const t = TODAY();
-  if (f === 'tous') return l => !['ancien', 'perdu'].includes(l.status);
+  if (f === 'tous') return l => !['ancien', 'perdu', 'ecarte'].includes(l.status);
   if (f === 'late') return l => l.next_at && l.next_at <= t && OPEN.includes(l.status);
   if (f === 'react') { const ids = new Set(reactivables().map(l => l.id)); return l => ids.has(l.id); }
+  if (['nonext', 'nophone', 'noamount'].includes(f)) { const ids = new Set(oublies()[f].map(l => l.id)); return l => ids.has(l.id); }
   return l => l.status === f;
+}
+function sortLeads(arr, k) {
+  const lastCall = l => { const c = callsOfLead(l.id).filter(x => !isCancel(x)); return c.length ? c[c.length - 1].call_at : (l.call_at || ''); };
+  const by = {
+    next: (a, b) => { const ka = a.next_at && OPEN.includes(a.status) ? a.next_at : '9', kb = b.next_at && OPEN.includes(b.status) ? b.next_at : '9'; return ka.localeCompare(kb) || lastCall(b).localeCompare(lastCall(a)); },
+    call: (a, b) => lastCall(b).localeCompare(lastCall(a)),
+    recent: (a, b) => String(b.created).localeCompare(String(a.created)),
+    score: (a, b) => (b.score === '' ? -1 : b.score) - (a.score === '' ? -1 : a.score),
+    price: (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0),
+    name: (a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }),
+  };
+  return arr.sort(by[k] || by.next);
 }
 function vLeads() {
   let html = formOpen ? vForm() : '';
   if (!S.leads.length && !formOpen) return html + `<div class="card"><div class="empty"><div class="big">Aucun lead pour le moment</div>Ajoute ton premier lead ou synchronise iClosed.</div></div>`;
+  const base = S.leads.filter(l => (!prefs.src || l.source === prefs.src) && (!prefs.temp || l.temp === prefs.temp));
+  const checks = FILTERS_CHECK.map(([k, lb]) => [k, lb, base.filter(filterFn(k)).length]).filter(x => x[2] || filter === x[0]);
   html += `<div class="filters">
-    <div class="search"><input class="inp" type="search" placeholder="Rechercher un nom, un e-mail, un numéro" value="${esc(search)}" oninput="search=this.value;renderList()"></div>
-    <div class="pills" id="pills">${FILTERS.map(([k, lb]) => { const n = S.leads.filter(filterFn(k)).length; return `<button class="${filter === k ? 'on' : ''} ${n ? '' : 'zero'}" onclick="setFilter('${k}')">${lb} <span class="c">${n}</span></button>`; }).join('')}</div></div>
+    <div class="toolbar"><input class="inp grow" type="search" placeholder="Rechercher : nom, e-mail, numéro, besoin, notes" value="${esc(search)}" oninput="search=this.value;leadsLimit=120;renderList()">
+      <select class="inp" onchange="setPref('src',this.value);render()" aria-label="Source"><option value="">Toutes les sources</option>${SOURCES.map(([k, lb]) => `<option value="${k}" ${prefs.src === k ? 'selected' : ''}>${lb}</option>`).join('')}</select>
+      <select class="inp" onchange="setPref('temp',this.value);render()" aria-label="Température"><option value="">Toutes températures</option>${TEMPS.map(([k, lb]) => `<option value="${k}" ${prefs.temp === k ? 'selected' : ''}>${lb}</option>`).join('')}</select>
+      <select class="inp" onchange="setPref('sort',this.value);renderList()" aria-label="Tri">${SORTS.map(([k, lb]) => `<option value="${k}" ${prefs.sort === k ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
+    <div class="pills" id="pills">${FILTERS.map(([k, lb]) => { const n = base.filter(filterFn(k)).length; return `<button class="${filter === k ? 'on' : ''} ${n ? '' : 'zero'}" onclick="setFilter('${k}')">${lb} <span class="c">${n}</span></button>`; }).join('')}</div>
+    ${checks.length ? `<div class="pills late">${checks.map(([k, lb, n]) => `<button class="${filter === k ? 'on' : ''}" onclick="setFilter('${k}')">${lb} <span class="c">${n}</span></button>`).join('')}</div>` : ''}</div>
     <div id="list">${listHtml()}</div>`;
   return html;
 }
-function setFilter(f) { filter = f; render(); }
+function setFilter(f) { filter = f; search = ''; leadsLimit = 120; render(); }
 function renderList() { const el = $('#list'); if (el) el.innerHTML = listHtml(); }
 function listHtml() {
   const q = search.trim().toLowerCase();
-  let arr = q ? S.leads.filter(l => (l.name + ' ' + l.email + ' ' + l.phone).toLowerCase().includes(q)) : S.leads.filter(filterFn(filter));
-  arr.sort((a, b) => {
-    const ka = a.next_at && OPEN.includes(a.status) ? a.next_at : '9', kb = b.next_at && OPEN.includes(b.status) ? b.next_at : '9';
-    if (ka !== kb) return ka.localeCompare(kb);
-    return String(b.call_at || b.created).localeCompare(String(a.call_at || a.created));
-  });
+  const base = S.leads.filter(l => (!prefs.src || l.source === prefs.src) && (!prefs.temp || l.temp === prefs.temp));
+  let arr = q ? base.filter(l => (l.name + ' ' + l.email + ' ' + l.phone + ' ' + phoneDigits(l.phone) + ' ' + l.need + ' ' + l.notes + ' ' + l.objection).toLowerCase().includes(q)) : base.filter(filterFn(filter));
+  arr = sortLeads(arr, prefs.sort);
   if (!arr.length) return `<div class="card"><div class="empty">Aucun lead ici.</div></div>`;
-  const more = arr.length > 120 ? `<div class="hint" style="text-align:center;margin:10px">${arr.length - 120} de plus : affine avec la recherche</div>` : '';
-  return arr.slice(0, 120).map(leadCard).join('') + more;
+  const more = arr.length > leadsLimit ? `<div class="more"><button class="btn sec2 sm" onclick="leadsLimit+=120;renderList()">Afficher ${Math.min(120, arr.length - leadsLimit)} de plus (${arr.length - leadsLimit} restants)</button></div>` : '';
+  return `<div class="count-line">${plural(arr.length, 'lead')}</div>` + arr.slice(0, leadsLimit).map(leadCard).join('') + more;
+}
+function resLabel(c) {
+  if (cKind(c) === 'client') return c.show === 'present' ? 'Séance faite' : isCancel(c) ? 'Séance annulée' : c.show === 'noshow' ? 'Séance manquée' : 'Séance';
+  if (c.show === 'reporte') return 'Reporté';
+  if (isCancel(c)) return 'Annulé';
+  if (c.show === 'noshow') return 'No-show';
+  if (c.show === 'present') { const r = RESULTS.find(x => x[0] === c.result); return r ? r[1] : 'Présent'; }
+  return ended(c) ? 'À remplir' : 'À venir';
+}
+function resChip(c) {
+  const lb = resLabel(c);
+  const cls = { 'Vendu': 'v', 'Follow-up': 'o', 'Pas vendu': 'r', 'No-show': 'r', 'À remplir': 'r', 'À venir': 'o', 'Séance faite': 'v' }[lb] || '';
+  return `<span class="chip ${cls}">${lb}</span>`;
 }
 function leadCard(l) {
   const open = expanded.has(l.id);
@@ -728,11 +1470,18 @@ function leadSummary(l) {
   const t = TODAY();
   const chips = [];
   if (l.source) chips.push(`<span class="chip">${esc(srcLabel(l.source))}</span>`);
-  if (l.call_at) chips.push(`<span class="chip ${l.call_at.slice(0, 10) >= t ? 'o' : ''}">Call ${fmtDate(l.call_at, { day: 'numeric', month: 'short', year: l.call_at.slice(0, 4) === t.slice(0, 4) ? undefined : 'numeric' })}${fmtTime(l.call_at) ? ' ' + fmtTime(l.call_at) : ''}</span>`);
-  if (l.ic_result && ['ancien', 'perdu'].includes(l.status)) chips.push(`<span class="chip">${esc(l.ic_result)}</span>`);
+  if (l.status !== 'vendu' && isClient(l)) chips.push('<span class="chip v">Client (séances)</span>');
+  const calls = callsOfLead(l.id);
+  const nxt = nextCallOf(l.id);
+  const last = calls.filter(c => ended(c) || c.show).pop();
+  if (nxt) chips.push(`<span class="chip o">Call ${esc(fmtDT(nxt.call_at))}</span>`);
+  if (last) chips.push(`<span class="chip">${nxt ? 'Dernier' : 'Call'} ${esc(fmtDate(last.call_at, { day: 'numeric', month: 'short', year: last.call_at.slice(0, 4) === t.slice(0, 4) ? undefined : 'numeric' }))}</span>${resChip(last)}`);
+  else if (!nxt && l.call_at) chips.push(`<span class="chip">Call ${esc(fmtDT(l.call_at))}</span>`);
+  if (calls.length > 1) chips.push(`<span class="chip mono">${calls.length} calls</span>`);
   if (l.score !== '') chips.push(`<span class="chip ${l.score >= 7 ? 'v' : l.score <= 4 ? 'r' : 'o'}">${l.score}/10</span>`);
+  if (l.temp) chips.push(`<span class="chip ${l.temp === 'chaud' ? 'v' : l.temp === 'tiede' ? 'o' : ''}">${esc((TEMPS.find(x => x[0] === l.temp) || [, l.temp])[1])}</span>`);
   if (l.price) chips.push(`<span class="chip mono">${euro(l.price)}${l.paid ? ' · encaissé ' + euro(l.paid) : ''}</span>`);
-  if (l.touches) chips.push(`<span class="chip mono">${l.touches} relance${l.touches > 1 ? 's' : ''}</span>`);
+  if (l.touches) chips.push(`<span class="chip mono">${plural(l.touches, 'relance')}</span>`);
   let next = '';
   if (l.next_at && OPEN.includes(l.status)) {
     const late = l.next_at < t;
@@ -745,47 +1494,83 @@ function leadEditor(l) {
   const id = l.id;
   const f = (k, type, ph, extra) => `<input class="inp" type="${type}" value="${esc(l[k])}" placeholder="${ph || ''}" ${extra || ''} onchange="upd('${id}','${k}',this.value,true)">`;
   const phone = !!phoneDigits(l.phone);
+  const calls = callsOfLead(id).slice().reverse();
+  const k = kindOf(l);
   return `<div class="editor">
-    <div class="actions" style="margin-top:12px">${phone ? `<button class="btn wa sm" onclick="sendWa('${id}')">WhatsApp (${esc(TPL_LABELS.find(x => x[0] === kindOf(l))[1].split(' (')[0].toLowerCase())})</button><a class="btn sec2 sm" href="tel:+${phoneDigits(l.phone)}">Appeler</a>` : ''}${l.email ? `<a class="btn sec2 sm" href="mailto:${esc(l.email)}">Mail</a>` : ''}${l.ic_link ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}</div>
+    <div class="actions" style="margin-top:12px">${phone ? `<button class="btn wa sm" onclick="sendWa('${id}')">WhatsApp · ${esc(tplShort(k))}</button><a class="btn sec2 sm" href="tel:+${phoneDigits(l.phone)}">Appeler</a>` : ''}${l.email ? `<a class="btn sec2 sm" href="mailto:${esc(l.email)}">Mail</a>` : ''}${l.ic_link && nextCallOf(id) ? `<a class="btn sec2 sm" href="${esc(l.ic_link)}" target="_blank" rel="noopener">Visio</a>` : ''}</div>
+    <span class="lbl">Calls (${calls.length})</span>
+    <div class="hist">${calls.length ? calls.map(c => `<div class="hrow" onclick="openCall('${c.id}')"><span class="mono">${esc(fmtDT(c.call_at))}</span><span class="ob">${kindLabel(cKind(c))}${c.objection ? ' · ' + esc(c.objection) : c.notes ? ' · ' + esc(c.notes.split('\n')[0]) : ''}</span>${resChip(c)}</div>`).join('') : '<div class="hint">Aucun call pour le moment.</div>'}</div>
+    <div class="addcall"><input class="inp" type="datetime-local" id="nc-${id}" aria-label="Date du call"><button class="btn sec2 sm" onclick="addCallUI('${id}')">+ Ajouter un call</button></div>
     <span class="lbl">Statut</span>
-    <div class="pills statuts">${STATUS.map(([k, lb, c]) => `<button class="${l.status === k ? 'on ' + c : ''}" onclick="upd('${id}','status','${k}')">${lb}</button>`).join('')}</div>
-    <span class="lbl">Qualifié /10</span>
-    <div class="pills score">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="${l.score === n ? 'on' : ''}" onclick="upd('${id}','score',${l.score === n ? "''" : n})">${n}</button>`).join('')}</div>
+    <div class="pills statuts">${STATUS.map(([k2, lb, c]) => `<button class="${l.status === k2 ? 'on ' + c : ''}" onclick="upd('${id}','status','${k2}')">${lb}</button>`).join('')}</div>
+    <div class="grid2">
+      <div><span class="lbl">Qualifié /10</span><div class="pills score">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<button class="${l.score === n ? 'on' : ''}" onclick="upd('${id}','score',${l.score === n ? "''" : n})">${n}</button>`).join('')}</div></div>
+      <div><span class="lbl">Température</span><div class="pills">${TEMPS.map(([k2, lb]) => `<button class="${l.temp === k2 ? 'on' : ''}" onclick="upd('${id}','temp','${l.temp === k2 ? '' : k2}')">${lb}</button>`).join('')}</div></div>
+    </div>
     <div class="grid2">
       <div><span class="lbl">Prochaine action</span>${f('next_action', 'text', 'Relancer, envoyer le programme')}</div>
       <div><span class="lbl">Le</span>${f('next_at', 'date')}
         <div class="quick"><button onclick="upd('${id}','next_at','${addDays(TODAY(), 1)}')">+1 j</button><button onclick="upd('${id}','next_at','${addDays(TODAY(), 3)}')">+3 j</button><button onclick="upd('${id}','next_at','${addDays(TODAY(), 7)}')">+7 j</button><button onclick="upd('${id}','next_at','')">Aucune</button></div></div>
-      <div><span class="lbl">Objection</span>${f('objection', 'text', 'Prix, timing, peur')}</div>
-      <div><span class="lbl">Source</span><select class="inp" onchange="upd('${id}','source',this.value)"><option value="">Source</option>${SOURCES.map(([k, lb]) => `<option value="${k}" ${l.source === k ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
+      <div><span class="lbl">Objection</span>${f('objection', 'text', 'Trop cher, veut réfléchir')}</div>
+      <div><span class="lbl">Source</span><select class="inp" onchange="upd('${id}','source',this.value)"><option value="">Source</option>${SOURCES.map(([k2, lb]) => `<option value="${k2}" ${l.source === k2 ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
+      <div><span class="lbl">Offre</span>${f('offer', 'text', 'Mentorat 90 jours')}</div>
+      <div><span class="lbl">Paiement</span><select class="inp" onchange="upd('${id}','payment',this.value)"><option value="">Paiement</option>${PAYMENTS.map(([k2, lb]) => `<option value="${k2}" ${l.payment === k2 ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
       <div><span class="lbl">Prix (€)</span>${f('price', 'number', '5 000', 'inputmode="numeric" min="0"')}</div>
-      <div><span class="lbl">Encaissé (€)</span>${f('paid', 'number', '0', 'inputmode="numeric" min="0"')}</div>
+      <div><span class="lbl">Encaissé (€)</span>${f('paid', 'number', '0', 'inputmode="numeric" min="0"')}${l.status === 'vendu' ? `<div class="quick"><button onclick="cashIn('${id}')">+ Paiement reçu</button></div>` : ''}</div>
       <div><span class="lbl">Téléphone</span>${f('phone', 'tel', '06 12 34 56 78', 'inputmode="tel"')}</div>
       <div><span class="lbl">E-mail</span>${f('email', 'email', 'prenom@exemple.fr', 'inputmode="email"')}</div>
-      <div><span class="lbl">Date du call</span>${f('call_at', 'datetime-local')}</div>
       <div><span class="lbl">Vendu le</span>${f('sold_at', 'date')}</div>
     </div>
     <span class="lbl">Besoin / situation</span>
     <textarea class="inp" onchange="upd('${id}','need',this.value,true)">${esc(l.need)}</textarea>
     <span class="lbl">Notes</span>
-    <textarea class="inp tall" placeholder="Notes du call" onchange="upd('${id}','notes',this.value,true)">${esc(l.notes)}</textarea>
+    <div class="addcall"><input class="inp" type="text" id="nn-${id}" placeholder="Ajouter une note datée (ex : a répondu, rappeler lundi)" onkeydown="if(event.key==='Enter')addNote('${id}')"><button class="btn sec2 sm" onclick="addNote('${id}')">Ajouter</button></div>
+    <textarea class="inp tall" style="margin-top:8px" placeholder="Notes" onchange="upd('${id}','notes',this.value,true)">${esc(l.notes)}</textarea>
     ${l.ic_info ? `<details class="icinfo"><summary>Historique iClosed</summary><div class="wa-prev">${esc(l.ic_info)}</div></details>` : ''}
-    <div class="meta-line">Créé ${fmtDT(l.created) || '?'}${l.updated ? ' · modifié ' + fmtDT(l.updated) : ''}${l.confirmed ? ' · confirmé ' + fmtDT(l.confirmed) : ''}${l.last_touch ? ' · relancé ' + fmtDate(l.last_touch) : ''}</div>
-    <div class="row"><button class="btn danger sm" onclick="delLead('${id}')">Supprimer</button><button class="btn ghost sm" onclick="toggleCard('${id}')">Fermer</button></div>
+    <div class="meta-line">Créé ${fmtDT(l.created) || '?'}${l.updated ? ' · modifié ' + fmtDT(l.updated) : ''}${l.last_touch ? ' · relancé ' + fmtDate(l.last_touch) : ''}</div>
+    <div class="row">${l.status === 'ecarte' ? `<button class="btn sec2 sm" onclick="upd('${id}','status','a_appeler')">Remettre dans le suivi</button>` : `<button class="btn sec2 sm" onclick="ecarter('${id}')">Écarter (doublon, test)</button>`}<div style="display:flex;gap:8px"><button class="btn danger sm" onclick="delLead('${id}')">Supprimer</button><button class="btn ghost sm" onclick="toggleCard('${id}')">Fermer</button></div></div>
   </div>`;
+}
+function addCallUI(id) {
+  const v = ($('#nc-' + id) || {}).value;
+  if (!v) { toast("Choisis la date et l'heure du call", true); return; }
+  const c = addCallFor(id, v, 'r1');
+  if (c) { toast('Call ajouté le ' + fmtDT(c.call_at)); render(); }
+}
+function addNote(id) {
+  const el = $('#nn-' + id), l = IX.lead[id]; if (!el || !l) return;
+  const t = el.value.trim(); if (!t) return;
+  const line = `${TODAY().slice(8, 10)}/${TODAY().slice(5, 7)} ${cfg().signature || 'Alex'} : ${t}`;
+  patch(id, { notes: l.notes ? line + '\n' + l.notes : line });
+  toast('Note ajoutée');
+}
+function ecarter(id) {
+  const n = callsOfLead(id).length;
+  if (n && !confirm(`Cette fiche porte ${plural(n, 'call')} : ${n > 1 ? 'ils sortiront' : 'il sortira'} des listes et des stats. Si c'est un doublon, écarte plutôt l'autre fiche. Écarter quand même ?`)) return;
+  patch(id, { status: 'ecarte', next_at: '', next_action: '' }); toast('Écarté : hors stats et hors relances');
 }
 function toggleCard(id) {
   if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
-  const l = S.leads.find(x => x.id === id), el = $('#card-' + id);
+  const l = IX.lead[id], el = $('#card-' + id);
   if (!l || !el) return render();
   const tmp = document.createElement('div'); tmp.innerHTML = leadCard(l); el.replaceWith(tmp.firstElementChild);
 }
-function goLead(id) { const l = S.leads.find(x => x.id === id); filter = 'tous'; search = l ? l.name.trim() : ''; expanded.add(id); showTab('leads'); }
+function goLead(id) {
+  const l = IX.lead[id]; filter = 'tous'; search = l ? l.name.trim() : ''; expanded.add(id);
+  if (l && prefs.src && l.source !== prefs.src) setPref('src', '');
+  if (l && prefs.temp && l.temp !== prefs.temp) setPref('temp', '');
+  closeModalSilently(); showTab('leads');
+}
+function closeModalSilently() { if (modal) { modal = null; F = null; fillQueue = null; runner = null; $('#runner').hidden = true; $('#runner').innerHTML = ''; } }
 async function delLead(id) {
-  const l = S.leads.find(x => x.id === id); if (!l) return;
-  if (!confirm(`Supprimer ${l.name || 'ce lead'} ? C'est définitif.${l.ic_contact ? '\n(Il reviendra à la prochaine synchro iClosed : passe-le plutôt en Perdu.)' : ''}`)) return;
-  S.leads = S.leads.filter(x => x.id !== id); expanded.delete(id); saveLocal(); render();
-  setQueue(getQueue().filter(op => !(op.what === 'upsert' && op.lead && op.lead.id === id)));
+  const l = IX.lead[id]; if (!l) return;
+  if (!confirm(`Supprimer ${l.name || 'ce lead'} ? C'est définitif.${l.ic_contact ? "\n(Il reviendra à la prochaine synchro iClosed : utilise plutôt « Écarter ».)" : ''}`)) return;
+  const manual = S.calls.filter(c => c.lead_id === id && !c.id.startsWith('icc')).map(c => c.id);
+  S.leads = S.leads.filter(x => x.id !== id); S.calls = S.calls.filter(c => !manual.includes(c.id)); expanded.delete(id);
+  lastWrite = Date.now(); reindex(); saveLocal(); render();
+  setQueue(getQueue().filter(op => !(op.what === 'upsert' && op.lead && op.lead.id === id) && !(op.what === 'call_upsert' && op.call && manual.includes(op.call.id))));
   await send({ what: 'delete', id });
+  for (const cid of manual) await send({ what: 'call_delete', id: cid });
   toast('Lead supprimé');
 }
 
@@ -800,78 +1585,228 @@ function vForm() {
       <div><span class="lbl">Source</span><select class="inp" id="n-source">${SOURCES.map(([k, lb]) => `<option value="${k}" ${(p.source || 'linkedin') === k ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
       <div><span class="lbl">Téléphone</span><input class="inp" id="n-phone" type="tel" inputmode="tel" value="${esc(p.phone || '')}" placeholder="06 12 34 56 78"></div>
       <div><span class="lbl">E-mail</span><input class="inp" id="n-email" type="email" inputmode="email" value="${esc(p.email || '')}" placeholder="prenom@exemple.fr"></div>
+      <div><span class="lbl">Call déjà prévu le <small style="letter-spacing:0;text-transform:none">(facultatif)</small></span><input class="inp" id="n-call" type="datetime-local"></div>
     </div>
     <span class="lbl">Besoin / situation</span>
     <textarea class="inp ${p.need ? 'tall' : ''}" id="n-need" placeholder="Son business, son blocage, ce qu'il veut">${esc(p.need || '')}</textarea>
     <span class="lbl">Notes</span>
     <textarea class="inp" id="n-notes">${esc(p.notes || '')}</textarea>
-    <div class="row"><button class="btn ghost" onclick="closeForm()">Annuler</button><button class="btn" onclick="submitForm()">Ajouter (à relancer aujourd'hui)</button></div></div>`;
+    <div class="row"><button class="btn ghost" onclick="closeForm()">Annuler</button><button class="btn" onclick="submitForm()">Ajouter</button></div></div>`;
 }
 function submitForm() {
   const name = $('#n-name').value.trim();
   if (!name) { toast('Il manque le nom', true); $('#n-name').focus(); return; }
+  const callAt = $('#n-call').value;
   const l = norm({
     id: newId(), created: isoNow(), updated: isoNow(), name, phone: $('#n-phone').value.trim(), email: $('#n-email').value.trim(),
     source: $('#n-source').value, status: 'a_appeler', next_at: TODAY(), next_action: formPrefill && formPrefill.from === 'live' ? 'Proposer un appel (live)' : 'Proposer un appel',
     need: $('#n-need').value.trim(), notes: $('#n-notes').value.trim(),
   });
-  S.leads.unshift(l); saveLocal();
-  formOpen = false; formPrefill = null; search = name; expanded.add(l.id); render();
-  send({ what: 'upsert', lead: { ...l } }).then(sent => toast(sent ? 'Lead ajouté, relance prévue aujourd\'hui' : 'Lead gardé en local, il partira dès que le pont répond'));
+  S.leads.unshift(l); lastWrite = Date.now(); reindex(); saveLocal();
+  formOpen = false; formPrefill = null; search = name; expanded.add(l.id);
+  send({ what: 'upsert', lead: { ...l } }).then(sent => {
+    if (callAt) addCallFor(l.id, callAt, 'r1');
+    toast(sent ? (callAt ? 'Lead ajouté avec son call' : "Lead ajouté, relance prévue aujourd'hui") : 'Lead gardé en local, il partira dès que le pont répond');
+    if (!modal) render();
+  });
+  render();
 }
 
 // ================= CALLS =================
+const CFILTERS = [['tous', 'Tous'], ['todo', 'À remplir'], ['vendu', 'Vendus'], ['followup', 'Follow-up'], ['perdu', 'Pas vendus'], ['non_qualifie', 'Pas qualifiés'], ['noshow', 'No-show'], ['annule', 'Annulés / reportés']];
+const CKINDS = [['ventes', 'Calls de vente'], ['r1', 'R1 seulement'], ['suivi', 'Suivis seulement'], ['client', 'Séances client'], ['tout', 'Tous les calls']];
+const CSORTS = [['recent', 'Tri : plus récents'], ['old', 'Tri : plus anciens'], ['score', 'Tri : qualif'], ['price', 'Tri : montant'], ['name', 'Tri : nom']];
+function cFilterFn(f) {
+  if (f === 'todo') return c => !isCancel(c) && !c.show;
+  if (f === 'noshow') return c => c.show === 'noshow';
+  if (f === 'annule') return isCancel;
+  if (['vendu', 'followup', 'perdu', 'non_qualifie'].includes(f)) return c => c.show === 'present' && c.result === f;
+  return () => true;
+}
+function cKindFn(k) { return c => k === 'tout' ? true : k === 'ventes' ? isSale(c) : cKind(c) === k; }
 function vCalls() {
-  const t = TODAY();
+  const view = prefs.cView === 'avenir' ? 'avenir' : 'passes';
   const up = upcoming();
-  const days = {};
-  up.forEach(l => { const d = l.call_at.slice(0, 10); (days[d] = days[d] || []).push(l); });
-  let html = `<div class="row" style="margin:0 0 12px"><span class="hint">${icSync ? 'iClosed synchronisé à ' + fmtTime(icSync) : 'iClosed pas encore synchronisé'} · les réservations arrivent seules</span><button class="btn sec2 sm" ${icBusy ? 'disabled' : ''} onclick="syncIclosed(true)">${icBusy ? 'Synchro…' : 'Synchro iClosed'}</button></div>`;
-  if (!up.length) html += `<div class="card"><div class="empty"><div class="big">Aucun call à venir</div>Réactive les anciens leads depuis l'onglet Aujourd'hui.</div></div>`;
-  Object.keys(days).sort().forEach(d => {
-    html += `<div class="sec">${dayLabel(d) === fmtDate(d) ? fmtDate(d, { weekday: 'long', day: 'numeric', month: 'long' }) : dayLabel(d)} <span class="n">${days[d].length}</span></div>` + days[d].map(l => todoCard(l, 'call')).join('');
-  });
-  const past = S.leads.filter(l => l.call_at && l.call_at.slice(0, 10) < t && l.call_at.slice(0, 10) >= addDays(t, -30) && l.status !== 'ancien').sort((a, b) => b.call_at.localeCompare(a.call_at));
-  if (past.length) html += `<div class="sec">30 derniers jours <span class="n">${past.length}</span></div><div class="card"><div class="tbl">${past.map(l => `<div class="tr" onclick="goLead('${l.id}')"><span class="mono">${fmtDate(l.call_at, { day: 'numeric', month: 'short' })}</span><span>${esc(l.name)}</span><span class="st ${stCls(l.status)}">${stLabel(l.status)}</span></div>`).join('')}</div></div>`;
+  let html = `<div class="subtabs"><button class="${view === 'passes' ? 'on' : ''}" onclick="setPref('cView','passes');render()">Calls passés</button><button class="${view === 'avenir' ? 'on' : ''}" onclick="setPref('cView','avenir');render()">À venir · ${up.length}</button></div>`;
+  if (view === 'avenir') {
+    html += `<div class="row" style="margin:0 0 12px"><span class="hint">${icSync ? 'iClosed synchronisé à ' + fmtTime(icSync) : 'iClosed pas encore synchronisé'} · les réservations arrivent seules</span><button class="btn sec2 sm" ${icBusy ? 'disabled' : ''} onclick="syncIclosed(true)">${icBusy ? 'Synchro…' : 'Synchro iClosed'}</button></div>`;
+    if (!up.length) return html + `<div class="card"><div class="empty"><div class="big">Aucun call à venir</div>Réactive les anciens leads depuis l'onglet Aujourd'hui.</div></div>`;
+    const days = {};
+    up.forEach(c => { const d = c.call_at.slice(0, 10); (days[d] = days[d] || []).push(c); });
+    Object.keys(days).sort().forEach(d => {
+      html += `<div class="sec">${dayLabel(d) === fmtDate(d) ? fmtDate(d, { weekday: 'long', day: 'numeric', month: 'long' }) : dayLabel(d)} <span class="n">${days[d].length}</span></div>` + days[d].map(c => upCard(c)).join('');
+    });
+    return html;
+  }
+  const p = perKey(), r = perRange(p);
+  const past = S.calls.filter(c => vis(c) && c.call_at && (ended(c) || isCancel(c) || c.show) && c.call_at.slice(0, 16) <= nowLocal() && inRange(c.call_at, r) && cKindFn(prefs.cKind)(c));
+  const q = callSearch.trim().toLowerCase();
+  html += periodBar() + `<div class="filters">
+    <div class="toolbar"><input class="inp grow" type="search" placeholder="Rechercher : nom, objection, notes" value="${esc(callSearch)}" oninput="callSearch=this.value;callsLimit=60;renderCallList()">
+      <select class="inp" onchange="setPref('cKind',this.value);callsLimit=60;render()" aria-label="Type de call">${CKINDS.map(([k, lb]) => `<option value="${k}" ${prefs.cKind === k ? 'selected' : ''}>${lb}</option>`).join('')}</select>
+      <select class="inp" onchange="setPref('cSort',this.value);renderCallList()" aria-label="Tri">${CSORTS.map(([k, lb]) => `<option value="${k}" ${prefs.cSort === k ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
+    <div class="pills">${CFILTERS.map(([k, lb]) => { const n = past.filter(cFilterFn(k)).length; return `<button class="${prefs.cFilter === k ? 'on' : ''} ${n ? '' : 'zero'}" onclick="setPref('cFilter','${k}');callsLimit=60;render()">${lb} <span class="c">${n}</span></button>`; }).join('')}</div></div>
+    <div id="clist">${callListHtml(past, q)}</div>`;
   return html;
+}
+function renderCallList() {
+  const el = $('#clist'); if (!el) return;
+  const r = perRange(perKey());
+  const past = S.calls.filter(c => vis(c) && c.call_at && (ended(c) || isCancel(c) || c.show) && c.call_at.slice(0, 16) <= nowLocal() && inRange(c.call_at, r) && cKindFn(prefs.cKind)(c));
+  el.innerHTML = callListHtml(past, callSearch.trim().toLowerCase());
+}
+function callListHtml(past, q) {
+  let arr = past.filter(cFilterFn(prefs.cFilter));
+  if (q) arr = arr.filter(c => { const l = IX.lead[c.lead_id] || {}; return (c.name + ' ' + (l.name || '') + ' ' + c.objection + ' ' + c.notes + ' ' + c.reason + ' ' + c.event).toLowerCase().includes(q); });
+  const by = {
+    recent: (a, b) => b.call_at.localeCompare(a.call_at),
+    old: (a, b) => a.call_at.localeCompare(b.call_at),
+    score: (a, b) => (b.score === '' ? -1 : b.score) - (a.score === '' ? -1 : a.score) || b.call_at.localeCompare(a.call_at),
+    price: (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0) || b.call_at.localeCompare(a.call_at),
+    name: (a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }),
+  };
+  arr.sort(by[prefs.cSort] || by.recent);
+  if (!arr.length) return `<div class="card"><div class="empty">Aucun call ici${perKey() !== 'all' ? ' sur cette période' : ''}.</div></div>`;
+  const todo = arr.filter(c => !isCancel(c) && !c.show && isSale(c));
+  const todoRecent = todo.filter(c => c.call_at.slice(0, 10) >= addDays(TODAY(), -60));
+  const head = `<div class="count-line">${plural(arr.length, 'call')}${todoRecent.length ? ` · <a href="#" onclick="startFill([${todoRecent.map(c => `'${c.id}'`).join(',')}]);return false">remplir un par un les ${todoRecent.length} sans résultat des 60 derniers jours</a>` : ''}</div>`;
+  const more = arr.length > callsLimit ? `<div class="more"><button class="btn sec2 sm" onclick="callsLimit+=60;renderCallList()">Afficher ${Math.min(60, arr.length - callsLimit)} de plus (${arr.length - callsLimit} restants)</button></div>` : '';
+  return head + arr.slice(0, callsLimit).map(pastCard).join('') + more;
+}
+// ce qu'il reste à faire après un call passé
+function resteAFaire(c, l) {
+  if (!isCancel(c) && !c.show && isSale(c)) return ['late', 'À faire', 'Remplir le résultat du call'];
+  if (!l) return ['done', 'Suite', 'Fiche introuvable'];
+  const nxt = nextCallOf(l.id);
+  if (nxt && nxt.call_at > c.call_at) return ['', 'Prochain call', quand(nxt.call_at)];
+  const later = callsOfLead(l.id).some(x => x.id !== c.id && x.call_at > c.call_at && x.show && !isCancel(x));
+  if (later) return ['done', 'Suite', 'Un call plus récent a eu lieu'];
+  if (l.status === 'vendu') { const p = payPlan(l); return p && p.rest ? [p.late ? 'late' : 'warn', 'Encaisser', `${euro(p.next)} ${p.late ? 'attendus depuis le' : 'le'} ${fmtDate(p.due, { day: 'numeric', month: 'long' })}`] : ['done', 'Client', l.payment ? 'Tout est encaissé' : 'Vente conclue']; }
+  if (OPEN.includes(l.status)) return l.next_at ? [l.next_at < TODAY() ? 'late' : '', l.next_at < TODAY() ? 'En retard' : dayLabel(l.next_at), l.next_action || 'Relance'] : ['warn', 'À décider', 'Aucune relance prévue'];
+  if (l.status === 'ancien') return ['done', 'Archivé', 'À réactiver'];
+  if (l.status === 'ecarte') return ['done', 'Écarté', 'Hors suivi'];
+  return ['done', 'Clos', stLabel(l.status)];
+}
+function pastCard(c) {
+  const l = IX.lead[c.lead_id];
+  const [cls, lbl, txt] = resteAFaire(c, l);
+  const extra = [];
+  if (c.objection) extra.push(`<span class="chip o">${esc(c.objection)}</span>`);
+  if (c.price !== '' && c.price) extra.push(`<span class="chip mono">${euro(c.price)}${c.payment ? ' · ' + esc(c.payment) : ''}</span>`);
+  if (c.temp) extra.push(`<span class="chip">${esc((TEMPS.find(x => x[0] === c.temp) || [, c.temp])[1])}</span>`);
+  if (c.conf_reply === 'ok') extra.push('<span class="chip v">Avait confirmé</span>');
+  const recap = [c.reason, c.next_step ? 'Prochaine étape : ' + c.next_step : '', c.notes].filter(Boolean).join('\n');
+  const phone = l && phoneDigits(l.phone);
+  return `<div class="card callc">
+    <div class="top2"><div><div class="when">${esc(fmtDT(c.call_at))} · ${ago(c.call_at)}</div><div class="name" onclick="${l ? `goLead('${l.id}')` : ''}">${esc(c.name || (l && l.name)) || 'Sans nom'}</div></div>${resChip(c)}</div>
+    <div class="chips">${chipsFor(c, l, extra)}${c.recording ? `<a class="chip v" href="${esc(c.recording)}" target="_blank" rel="noopener">Enregistrement</a>` : ''}</div>
+    ${recap ? `<div class="recap">${esc(recap)}</div>` : ''}
+    <div class="todo-line ${cls}"><b>${esc(lbl)}</b><span>${esc(txt)}</span></div>
+    <div class="actions"><button class="btn sm ${!c.show && !isCancel(c) ? '' : 'sec2'}" onclick="openCall('${c.id}')">${!c.show && !isCancel(c) ? 'Remplir' : 'Modifier'}</button>${phone && l && OPEN.includes(l.status) && (c.show || isCancel(c)) ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp · ${esc(tplShort(kindOf(l)))}</button>` : ''}${l ? `<button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button>` : ''}</div></div>`;
 }
 
 // ================= CHIFFRES =================
-function monthsAvailable() {
-  const set = new Set([monthKey(TODAY())]);
-  S.leads.forEach(l => { if (l.call_at) set.add(monthKey(l.call_at)); if (l.sold_at) set.add(monthKey(l.sold_at)); });
-  return [...set].filter(Boolean).sort().reverse().slice(0, 12);
-}
+let srcSort = 'calls';
 function vChiffres() {
-  const months = monthsAvailable();
-  if (!month || (month !== 'all' && !months.includes(month))) month = months[0];
-  const st = monthStats(month);
-  const show = st.shows.length + st.noshow.length ? Math.round(100 * st.shows.length / (st.shows.length + st.noshow.length)) : null;
-  const inM = iso => month === 'all' ? !!iso : monthKey(iso) === month;
+  const p = perKey(), r = perRange(p);
+  const st = stats(r);
+  const pr = prevRange(p), ps = pr ? stats(pr) : null;
+  const fuOpen = S.leads.filter(l => l.status === 'followup'), fuVal = sumOf(fuOpen, 'price');
+  let html = periodBar();
+  if (st.blank.length) html += `<div class="goulot r"><b>${plural(st.blank.length, 'call')} sans résultat sur la période</b><span>Les taux ne comptent que les calls remplis.</span><div class="gbtn"><button class="btn sm" onclick="startFill([${st.blank.map(c => `'${c.id}'`).join(',')}])">Remplir un par un</button></div></div>`;
+  const dl = (a, b, k) => ps ? delta(a, b, k) : '';
+  html += `<div class="kpis k8">
+    <div class="kpi click" onclick="goCalls('tous')"><div class="v">${st.booked.length}</div><div class="l">Calls bookés</div><div class="s">${st.annules.length} annulés ou reportés${dl(p === curKey() ? st.booked.filter(c => c.call_at.slice(0, 10) <= TODAY()).length : st.booked.length, ps && ps.booked.length)}</div></div>
+    <div class="kpi click" onclick="goCalls('noshow')"><div class="v ${st.show === null ? 'm' : st.show >= 0.7 ? 'g' : 'o'}">${pc(st.show)}</div><div class="l">Show-up</div><div class="s">${st.tenus.length} tenus · ${st.noshow.length} no-show${dl(st.show, ps && ps.show, 'rate')}</div></div>
+    <div class="kpi click" onclick="goCalls('vendu')"><div class="v ${st.closing === null ? 'm' : st.closing >= 0.25 ? 'g' : 'o'}">${pc(st.closing)}</div><div class="l">Closing</div><div class="s">${st.ventes.length} ventes · ${pc(st.closingP)} sur pitchés${dl(st.closing, ps && ps.closing, 'rate')}</div></div>
+    <div class="kpi"><div class="v g">${euro(st.ca)}</div><div class="l">CA signé</div><div class="s">panier ${st.panier === null ? '–' : euro(st.panier)}${dl(st.ca, ps && ps.ca, 'eur')}</div></div>
+    <div class="kpi"><div class="v">${euro(st.cash)}</div><div class="l">Encaissé</div><div class="s">${(() => { const unk = st.ventes.filter(l => !l.payment && !(Number(l.paid) > 0)).length; const rest = st.ventes.filter(l => l.payment || Number(l.paid) > 0).reduce((s2, l) => s2 + Math.max(0, (Number(l.price) || 0) - (Number(l.paid) || 0)), 0); return unk ? plural(unk, 'vente') + ' sans encaissement renseigné' : st.ventes.length ? 'reste ' + euro(rest) + ' à encaisser' : 'sur les ventes de la période'; })()}</div></div>
+    <div class="kpi"><div class="v">${st.parCall === null ? '–' : euro(st.parCall)}</div><div class="l">CA par call tenu</div><div class="s">ce que rapporte un call</div></div>
+    <div class="kpi click" onclick="goCalls('non_qualifie')"><div class="v ${st.qualif === null ? 'm' : st.qualif >= 6 ? 'g' : 'o'}">${st.qualif === null ? '–' : (Math.round(st.qualif * 10) / 10).toLocaleString('fr-FR') + '/10'}</div><div class="l">Qualité des leads</div><div class="s">${st.nq.length} pas qualifiés (${pc(ratio(st.nq.length, st.tenus.length))})</div></div>
+    <div class="kpi click" onclick="goLeads('followup')"><div class="v o">${fuOpen.length}</div><div class="l">Follow-ups ouverts</div><div class="s">${fuVal ? euro(fuVal) + ' sur la table' : 'tous mois confondus'}</div></div>
+  </div>${ps && (ps.passes.length || ps.ventes.length) ? `<div class="count-line">Flèches : comparaison avec ${p === curKey() ? 'le mois dernier à la même date' : moisNom(monthShift(p, -1))}.</div>` : ''}`;
+  // chaîne de conversion
+  const chain = [['Calls bookés', st.booked.length], ['Gardent leur créneau', st.booked.length - st.annules.length], ['Calls tenus', st.tenus.length], ['Offre présentée', st.pitches.length], ['Ventes', st.ventes.length]];
+  html += `<div class="card"><h2>De la réservation à la vente <small>${esc(perLabel(p))}</small></h2><p class="note">Les calls pas encore remplis ne sont comptés ni en tenus ni en no-show.</p><div class="chain">${chain.map(([lb, n], i) => { const prev = i ? chain[i - 1][1] : null; return `<div class="fl"><span>${lb}</span><div class="fb"><i style="width:${chain[0][1] ? Math.round(100 * n / chain[0][1]) : 0}%"></i></div><span class="fn">${n}</span><span class="fr">${i ? pc(ratio(n, prev)) : ''}</span></div>`; }).join('')}</div></div>`;
+  // mois par mois
+  const months = monthsWithData().slice(0, 24);
+  const mRows = months.map(k => { const s = stats(perRange(k)); return { k, s }; });
+  const all = p === 'all' ? st : stats({ all: true });
+  html += `<div class="card"><h2>Mois par mois</h2><p class="note">Clique sur un mois pour l'afficher.</p><div class="tblw">
+    <div class="gt th g6"><span>Mois</span><span>Calls</span><span>Show-up</span><span>Ventes</span><span>Closing</span><span>CA signé</span></div>
+    ${mRows.map(({ k, s }) => `<div class="gt g6 link ${p === k ? 'sel' : ''}" onclick="setPeriod('${k}')"><span>${esc(moisCourt(k))}</span><span>${s.passes.length}</span><span>${pc(s.show)}</span><span>${s.ventes.length}</span><span>${pc(s.closing)}</span><span>${euro(s.ca)}</span></div>`).join('')}
+    <div class="gt g6 tot link ${p === 'all' ? 'sel' : ''}" onclick="setPeriod('all')"><span>Tout</span><span>${all.passes.length}</span><span>${pc(all.show)}</span><span>${all.ventes.length}</span><span>${pc(all.closing)}</span><span>${euro(all.ca)}</span></div></div></div>`;
+  // par source
   const bySrc = {};
-  st.calls.forEach(l => { const s = srcLabel(l.source) || 'Autre'; const o = bySrc[s] = bySrc[s] || { calls: 0, shows: 0, ventes: 0, ca: 0 }; o.calls++; if (st.shows.includes(l)) o.shows++; });
-  st.ventes.forEach(l => { const s = srcLabel(l.source) || 'Autre'; const o = bySrc[s] = bySrc[s] || { calls: 0, shows: 0, ventes: 0, ca: 0 }; o.ventes++; o.ca += Number(l.price) || 0; });
-  const objs = {}; S.leads.filter(l => l.objection && inM(l.call_at)).forEach(l => { const k = l.objection.trim().toLowerCase(); objs[k] = (objs[k] || 0) + 1; });
-  const reasons = {}; st.calls.filter(l => ['perdu', 'ancien'].includes(l.status) && l.ic_result).forEach(l => { reasons[l.ic_result] = (reasons[l.ic_result] || 0) + 1; });
-  const fu = S.leads.filter(l => l.status === 'followup');
-  const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 6);
-  return `<div class="pills" style="margin-bottom:12px">${months.map(m => `<button class="${month === m ? 'on' : ''}" onclick="month='${m}';render()">${monthLabel(m)}</button>`).join('')}<button class="${month === 'all' ? 'on' : ''}" onclick="month='all';render()">Tout</button></div>
-    ${st.blank.length ? `<div class="goulot r"><b>${st.blank.length} call${st.blank.length > 1 ? 's' : ''} sans résultat sur la période</b><span>Les taux ci-dessous ne comptent que les calls remplis.</span></div>` : ''}
-    <div class="kpis">
-      <div class="kpi"><div class="v">${st.calls.length}</div><div class="l">Calls passés</div><div class="s">${st.shows.length} tenus · ${st.noshow.length} no-show</div></div>
-      <div class="kpi"><div class="v ${show === null ? '' : show >= 70 ? 'g' : 'o'}">${show === null ? '–' : show + ' %'}</div><div class="l">Show-up</div></div>
-      <div class="kpi"><div class="v g">${st.ventes.length}</div><div class="l">Ventes</div><div class="s">closing ${pct(st.ventes.length, st.shows.length)}</div></div>
-      <div class="kpi"><div class="v g">${euro(st.ca)}</div><div class="l">CA signé</div><div class="s">encaissé ${euro(st.cash)}${st.ventes.length ? ' · panier ' + euro(st.ca / st.ventes.length) : ''}</div></div>
-      <div class="kpi"><div class="v o">${fu.length}</div><div class="l">Follow-ups ouverts</div><div class="s">tous mois confondus</div></div>
-    </div>
-    ${Object.keys(bySrc).length ? `<div class="card"><h2>Par source</h2><div class="tbl src"><div class="tr th"><span>Source</span><span>Calls</span><span>Tenus</span><span>Ventes</span><span>CA</span></div>${Object.entries(bySrc).sort((a, b) => b[1].calls - a[1].calls).map(([s, o]) => `<div class="tr"><span>${esc(s)}</span><span>${o.calls}</span><span>${o.shows}</span><span>${o.ventes}</span><span>${euro(o.ca)}</span></div>`).join('')}</div></div>` : ''}
-    ${Object.keys(objs).length || Object.keys(reasons).length ? `<div class="card"><h2>Pourquoi ça ne signe pas</h2>${top(objs).map(([k, n]) => `<div class="tr2"><span>Objection : ${esc(k)}</span><b>${n}</b></div>`).join('')}${top(reasons).map(([k, n]) => `<div class="tr2"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}</div>` : ''}
-    <div class="card"><h2>Ventes <small>${month === 'all' ? 'tout' : monthLabel(month)}</small></h2>
-      ${st.ventes.length ? st.ventes.sort((a, b) => b.sold_at.localeCompare(a.sold_at)).map(l => `<div class="sale" onclick="goLead('${l.id}')"><div><div class="n">${esc(l.name)}</div><div class="d">${fmtDate(l.sold_at, { day: 'numeric', month: 'long', year: 'numeric' })}${l.source ? ' · ' + esc(srcLabel(l.source)) : ''}</div></div>
-        <div class="p"><b>${euro(l.price)}</b><span>${Number(l.paid) >= Number(l.price) && l.price ? 'encaissé' : l.paid ? 'encaissé ' + euro(l.paid) : 'à encaisser'}</span></div></div>`).join('')
-      : '<div class="empty">Pas de vente sur cette période.</div>'}
-    </div>`;
+  const so = s => bySrc[s] = bySrc[s] || { calls: 0, tenus: 0, ns: 0, ventes: 0, ca: 0 };
+  st.passes.forEach(c => { const l = IX.lead[c.lead_id]; const o = so(srcLabel(l && l.source) || 'Autre'); o.calls++; if (c.show === 'present') o.tenus++; if (c.show === 'noshow') o.ns++; });
+  st.ventes.forEach(l => { const o = so(srcLabel(l.source) || 'Autre'); o.ventes++; o.ca += Number(l.price) || 0; });
+  const srcRows = Object.entries(bySrc).sort((a, b) => srcSort === 'ca' ? b[1].ca - a[1].ca : srcSort === 'ventes' ? b[1].ventes - a[1].ventes : b[1].calls - a[1].calls);
+  if (srcRows.length) html += `<div class="card"><h2>Par source</h2><div class="tblw">
+    <div class="gt th g6"><span>Source</span><span onclick="srcSort='calls';render()">Calls${srcSort === 'calls' ? ' ▼' : ''}</span><span>Show-up</span><span onclick="srcSort='ventes';render()">Ventes${srcSort === 'ventes' ? ' ▼' : ''}</span><span>Closing</span><span onclick="srcSort='ca';render()">CA${srcSort === 'ca' ? ' ▼' : ''}</span></div>
+    ${srcRows.map(([s, o]) => `<div class="gt g6"><span>${esc(s)}</span><span>${o.calls}</span><span>${pc(ratio(o.tenus, o.tenus + o.ns))}</span><span>${o.ventes}</span><span>${pc(ratio(o.ventes, o.tenus))}</span><span>${euro(o.ca)}</span></div>`).join('')}</div></div>`;
+  // objections
+  const nonClose = st.tenus.filter(c => c.result === 'followup' || c.result === 'perdu');
+  const objs = {}; nonClose.forEach(c => objList(c.objection).map(objFamily).forEach(o => { objs[o] = (objs[o] || 0) + 1; }));
+  const nqs = {}; st.nq.forEach(c => objList(c.objection).map(objFamily).forEach(o => { nqs[o] = (nqs[o] || 0) + 1; }));
+  const bars = (o, tot) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, n]) => `<div class="br"><span>${esc(k)}</span><div class="bw"><i style="width:${Math.round(100 * n / Math.max(1, tot))}%"></i></div><b>${n}</b></div>`).join('');
+  if (Object.keys(objs).length || Object.keys(nqs).length) {
+    html += `<div class="card"><h2>Pourquoi ça ne signe pas</h2>`;
+    if (Object.keys(objs).length) html += `<p class="note">Objections des ${plural(nonClose.length, 'call')} follow-up ou pas vendu (plusieurs possibles par call).</p><div class="bars">${bars(objs, nonClose.length)}</div>`;
+    if (Object.keys(nqs).length) html += `<p class="note" style="margin-top:12px">Pas qualifiés : pourquoi (${st.nq.length}).</p><div class="bars">${bars(nqs, st.nq.length)}</div>`;
+    html += `</div>`;
+  }
+  // qualification vs closing
+  const buckets = [['1 à 4', 1, 4], ['5 ou 6', 5, 6], ['7 ou 8', 7, 8], ['9 ou 10', 9, 10]].map(([lb, a, b]) => {
+    const cs = st.tenus.filter(c => c.score !== '' && c.score >= a && c.score <= b);
+    const leads = [...new Set(cs.map(c => c.lead_id))];
+    const sold = leads.filter(id => (IX.lead[id] || {}).status === 'vendu').length;
+    return [lb, cs.length, sold, ratio(sold, leads.length)];
+  }).filter(x => x[1]);
+  if (buckets.length) html += `<div class="card"><h2>Qualification et closing</h2><p class="note">Calls tenus par note /10 : où Lucas signe vraiment.</p><div class="tblw"><div class="gt th g4"><span>Note</span><span>Calls</span><span>Vendus</span><span>Closing</span></div>${buckets.map(([lb, n, s, rt]) => `<div class="gt g4"><span>${lb}</span><span>${n}</span><span>${s}</span><span>${pc(rt)}</span></div>`).join('')}</div></div>`;
+  // délai de réservation et confirmations
+  const delays = [['Le jour même', 0, 0], ['Le lendemain', 1, 1], ['2 à 3 jours', 2, 3], ['4 à 7 jours', 4, 7], ['8 jours et plus', 8, 9999]].map(([lb, a, b]) => {
+    const cs = st.passes.filter(c => c.created && (c.show === 'present' || c.show === 'noshow')).filter(c => { const d = daysBetween(c.created, c.call_at); return d >= a && d <= b; });
+    return [lb, cs.length, ratio(cs.filter(c => c.show === 'present').length, cs.length)];
+  }).filter(x => x[1]);
+  if (delays.length) html += `<div class="card"><h2>Show-up selon le délai de réservation</h2><p class="note">Entre la réservation et le call. Si les réservations lointaines viennent moins, raccourcis la fenêtre iClosed.</p><div class="tblw"><div class="gt th g4"><span>Réservé</span><span>Calls</span><span></span><span>Show-up</span></div>${delays.map(([lb, n, rt]) => `<div class="gt g4"><span>${lb}</span><span>${n}</span><span></span><span>${pc(rt)}</span></div>`).join('')}</div></div>`;
+  const confd = st.passes.filter(c => c.show === 'present' || c.show === 'noshow');
+  const cgroups = [['A confirmé', confd.filter(c => c.conf_reply === 'ok')], ['Message envoyé, sans réponse', confd.filter(c => c.conf_sent && c.conf_reply !== 'ok')], ['Pas de message', confd.filter(c => !c.conf_sent && c.conf_reply !== 'ok')]].filter(x => x[1].length);
+  if (confd.some(c => c.conf_sent || c.conf_reply)) html += `<div class="card"><h2>Effet des confirmations</h2><div class="tblw"><div class="gt th g4"><span>Avant le call</span><span>Calls</span><span></span><span>Show-up</span></div>${cgroups.map(([lb, cs]) => `<div class="gt g4"><span>${lb}</span><span>${cs.length}</span><span></span><span>${pc(ratio(cs.filter(c => c.show === 'present').length, cs.length))}</span></div>`).join('')}</div></div>`;
+  // encaissements
+  const toCash = S.leads.filter(l => l.status === 'vendu' && Number(l.price) > (Number(l.paid) || 0) && l.payment);
+  if (toCash.length) html += `<div class="card"><h2>Reste à encaisser <small>${euro(toCash.reduce((s, l) => s + (Number(l.price) - (Number(l.paid) || 0)), 0))}</small></h2>${toCash.sort((a, b) => String((payPlan(a) || {}).due || '9').localeCompare(String((payPlan(b) || {}).due || '9'))).map(l => payRow(l, payPlan(l))).join('')}</div>`;
+  // ventes
+  html += `<div class="card"><h2>Ventes <small>${esc(perLabel(p))}</small></h2>
+    ${st.ventes.length ? st.ventes.slice().sort((a, b) => b.sold_at.localeCompare(a.sold_at)).map(l => `<div class="sale" onclick="goLead('${l.id}')"><div><div class="n">${esc(l.name)}</div><div class="d">${fmtDate(l.sold_at, { day: 'numeric', month: 'long', year: 'numeric' })}${l.source ? ' · ' + esc(srcLabel(l.source)) : ''}${l.offer ? ' · ' + esc(l.offer) : ''}${l.payment ? ' · ' + esc(l.payment) : ''}</div></div>
+      <div class="p"><b>${euro(l.price)}</b><span>${Number(l.price) && Number(l.paid) >= Number(l.price) ? 'encaissé' : l.paid ? 'encaissé ' + euro(l.paid) : l.payment ? 'à encaisser' : 'encaissement non renseigné'}</span></div></div>`).join('')
+    : '<div class="empty">Pas de vente sur cette période.</div>'}
+  </div>
+  <div class="more"><button class="btn sec2" onclick="openBrief()">Récap à envoyer à Lucas</button></div>`;
+  return html;
 }
+function openBrief() {
+  const p = perKey(), st = stats(perRange(p));
+  const fu = S.leads.filter(l => l.status === 'followup'), fuVal = sumOf(fu, 'price');
+  const objs = {}; st.tenus.filter(c => c.result === 'followup' || c.result === 'perdu').forEach(c => objList(c.objection).map(objFamily).forEach(o => { objs[o] = (objs[o] || 0) + 1; }));
+  const topObj = Object.entries(objs).sort((a, b) => b[1] - a[1])[0];
+  const hot = fu.filter(l => l.temp === 'chaud').map(l => firstName(l.name) || l.name).slice(0, 5);
+  const lbl = p === 'all' ? 'depuis le début' : p === curKey() ? moisNom(p).toLowerCase() + ' (au ' + fmtDate(TODAY(), { day: 'numeric', month: 'long' }) + ')' : moisNom(p).toLowerCase();
+  const lines = [
+    `Point closing · ${lbl}`,
+    `Calls tenus : ${st.tenus.length} sur ${st.passes.length} passés · show-up ${pc(st.show)}`,
+    `Ventes : ${st.ventes.length} · closing ${pc(st.closing)} · CA signé ${euro(st.ca)} · encaissé ${euro(st.cash)}`,
+    fu.length ? `Follow-ups ouverts : ${fu.length}${fuVal ? ' (' + euro(fuVal) + ' sur la table)' : ''}${hot.length ? ' · chauds : ' + hot.join(', ') : ''}` : '',
+    topObj ? `Objection n°1 : ${topObj[0]} (${topObj[1]})` : '',
+    st.nq.length ? `Pas qualifiés : ${st.nq.length} sur ${st.tenus.length} calls tenus` : '',
+    st.blank.length ? `À remplir : ${plural(st.blank.length, 'call')} sans résultat` : '',
+  ].filter(Boolean).join('\n');
+  modal = 'brief'; showModal();
+  $('#runner').innerHTML = `<div class="rn-box"><div class="rn-top"><b>Récap pour Lucas</b><button class="icon" onclick="closeModal()">✕</button></div>
+    <div class="brief" id="brief-t">${esc(lines)}</div>
+    <div class="row"><button class="btn sec2" onclick="copyBrief()">Copier</button><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(lines)}" target="lucas-wa">Envoyer sur WhatsApp</a></div></div>`;
+}
+function copyBrief() { const t = $('#brief-t').textContent; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copié')).catch(() => toast('Copie impossible : sélectionne le texte', true)); }
 
 // ================= INSCRITS AU LIVE =================
 function leadFor(i) {
@@ -879,7 +1814,7 @@ function leadFor(i) {
   return S.leads.find(l => (em && l.email.trim().toLowerCase() === em) || (ph && phoneDigits(l.phone) === ph));
 }
 function vInscrits() {
-  let html = `<div class="row" style="margin:0 0 12px"><span class="hint">Sheet « Live Leads and Business »${inscritsLoaded ? ' · ' + S.inscrits.length + ' inscrit' + (S.inscrits.length > 1 ? 's' : '') : ''}</span><button class="btn sec2 sm" onclick="loadInscrits(true)" ${inscritsBusy ? 'disabled' : ''}>${inscritsBusy ? 'Chargement' : 'Rafraîchir'}</button></div>`;
+  let html = `<div class="row" style="margin:0 0 12px"><span class="hint">Sheet « Live Leads and Business »${inscritsLoaded ? ' · ' + plural(S.inscrits.length, 'inscrit') : ''}</span><button class="btn sec2 sm" onclick="loadInscrits(true)" ${inscritsBusy ? 'disabled' : ''}>${inscritsBusy ? 'Chargement' : 'Rafraîchir'}</button></div>`;
   if (inscritsBusy && !S.inscrits.length) return html + `<div class="card"><div class="empty">Lecture du Sheet des inscriptions</div></div>`;
   if (!S.inscrits.length) return html + `<div class="card"><div class="empty"><div class="big">Aucun inscrit</div>Les inscriptions à la LP du live apparaîtront ici.</div></div>`;
   return html + S.inscrits.map((i, idx) => {
@@ -887,7 +1822,7 @@ function vInscrits() {
     const details = [['Profil', i.profil], ['Business', i.business], ['Blocage 1', i.blocage1], ['Blocage 2', i.blocage2], ['Blocage 3', i.blocage3], ['Objectif', i.objectif], ['CA mensuel', i.ca]].filter(x => x[1]);
     return `<div class="card ins">
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div class="name">${esc(i.prenom) || esc(i.email)}</div>${i.mode ? `<span class="chip ${i.mode === 'coaching' ? 'v' : ''}">${i.mode === 'coaching' ? 'Veut être coaché' : 'Assiste'}</span>` : ''}</div>
-      <div class="chips">${i.session ? `<span class="chip o">Live du ${fmtDate(i.session)}</span>` : ''}${i.tel ? `<span class="chip mono">${esc(i.tel)}</span>` : ''}${i.etape ? `<span class="chip">${esc(i.etape)}</span>` : ''}</div>
+      <div class="chips">${i.session ? `<span class="chip o">Live du ${esc(fmtDate(i.session))}</span>` : ''}${i.tel ? `<span class="chip mono">${esc(i.tel)}</span>` : ''}${i.etape ? `<span class="chip">${esc(i.etape)}</span>` : ''}</div>
       ${details.length ? `<details><summary>Son cas</summary><div class="txt">${details.map(([k, v]) => `<div><b>${k}</b> ${esc(v)}</div>`).join('')}</div></details>` : ''}
       <div class="actions">${l ? `<span class="chip v">Fiche · ${stLabel(l.status)}</span><button class="btn ghost sm" onclick="goLead('${l.id}')">Ouvrir</button>` : `<button class="btn sm" onclick="fromInscrit(${idx})">Créer la fiche</button>${phoneDigits(i.tel) ? `<button class="btn wa sm" onclick="waInscrit(${idx})">Proposer un appel</button>` : ''}`}</div>
     </div>`;
@@ -903,7 +1838,7 @@ function fromInscrit(idx) { const i = S.inscrits[idx]; if (i) openForm({ from: '
 function waInscrit(idx) {
   const i = S.inscrits[idx]; if (!i) return;
   const l = norm({ id: newId(), created: isoNow(), updated: isoNow(), status: 'a_appeler', next_at: TODAY(), next_action: 'Proposer un appel (live)', ...inscritLead(i) });
-  S.leads.unshift(l); saveLocal();
+  S.leads.unshift(l); lastWrite = Date.now(); reindex(); saveLocal();
   send({ what: 'upsert', lead: { ...l } });
   sendWa(l.id, 'live');
   render();
@@ -912,17 +1847,20 @@ function waInscrit(idx) {
 // ================= RÉGLAGES =================
 function openSettings() {
   const c = cfg();
-  modal = true;
-  $('#runner').hidden = false;
+  modal = 'settings'; showModal();
   $('#runner').innerHTML = `<div class="rn-box">
-    <div class="rn-top"><b>Réglages</b><button class="icon" onclick="stopRunner()">✕</button></div>
+    <div class="rn-top"><b>Réglages</b><button class="icon" onclick="closeModal()">✕</button></div>
     <div class="grid2">
       <div><span class="lbl">Objectif CA du mois (€)</span><input class="inp" id="s-ca" type="number" inputmode="numeric" value="${esc(c.objectif_ca)}" placeholder="20000"></div>
       <div><span class="lbl">Objectif ventes du mois</span><input class="inp" id="s-v" type="number" inputmode="numeric" value="${esc(c.objectif_ventes)}" placeholder="4"></div>
+      <div><span class="lbl">Show-up visé (%)</span><input class="inp" id="s-sv" type="number" inputmode="numeric" value="${esc(c.show_vise)}" placeholder="70"></div>
+      <div><span class="lbl">Closing visé (%)</span><input class="inp" id="s-cv" type="number" inputmode="numeric" value="${esc(c.closing_vise)}" placeholder="20"></div>
       <div><span class="lbl">Signature des messages</span><input class="inp" id="s-sig" type="text" value="${esc(c.signature)}"></div>
       <div><span class="lbl">Lien de réservation iClosed</span><input class="inp" id="s-ic" type="url" value="${esc(c.iclosed)}"></div>
     </div>
-    <p class="hint" style="margin-top:12px">Variables : {prenom} {quand} {visio} {iclosed} {signature}. Pas d'emoji (ça casse les liens WhatsApp).</p>
+    <span class="lbl">Offres proposées <small style="letter-spacing:0;text-transform:none">une par ligne, prix facultatif : Mentorat 90 jours · 5000</small></span>
+    <textarea class="inp" id="s-off">${esc(c.offres)}</textarea>
+    <p class="hint" style="margin-top:12px">Variables des messages : {prenom} {quand} {visio} {iclosed} {signature} {objection}. Pas d'emoji (ça casse les liens WhatsApp). Une ligne qui contient {visio} ou {objection} disparaît quand l'info manque.</p>
     ${TPL_LABELS.map(([k, lb]) => `<span class="lbl">${lb}</span><textarea class="inp" id="s-t-${k}">${esc(c.tpl[k])}</textarea>`).join('')}
     <div class="row"><button class="btn ghost sm" onclick="resetTpl()">Messages par défaut</button><button class="btn" onclick="saveSettings()">Enregistrer</button></div>
   </div>`;
@@ -930,15 +1868,15 @@ function openSettings() {
 function resetTpl() { TPL_LABELS.forEach(([k]) => { $('#s-t-' + k).value = DEFAULTS.tpl[k]; }); }
 async function saveSettings() {
   const tpl = {}; TPL_LABELS.forEach(([k]) => { tpl[k] = $('#s-t-' + k).value; });
-  const settings = { objectif_ca: $('#s-ca').value, objectif_ventes: $('#s-v').value, signature: $('#s-sig').value.trim(), iclosed: $('#s-ic').value.trim(), tpl };
+  const settings = { objectif_ca: $('#s-ca').value, objectif_ventes: $('#s-v').value, show_vise: $('#s-sv').value, closing_vise: $('#s-cv').value, signature: $('#s-sig').value.trim(), iclosed: $('#s-ic').value.trim(), offres: $('#s-off').value.trim(), tpl };
   S.settings = { ...S.settings, ...settings }; saveLocal();
-  stopRunner();
+  closeModal();
   const okSent = await send({ what: 'settings_set', settings });
   toast(okSent ? 'Réglages enregistrés' : 'Réglages gardés en local');
 }
 
 // ---------- démarrage ----------
-addEventListener('hashchange', () => { const t = (location.hash || '').replace('#', ''); if (t && t !== tab) { tab = t; if (t === 'inscrits' && !inscritsLoaded) loadInscrits(); render(); } });
+addEventListener('hashchange', () => { const t = (location.hash || '').replace('#', ''); if (t && t !== tab && TABS.some(x => x[0] === t)) { tab = t; if (t === 'inscrits' && !inscritsLoaded) loadInscrits(); if (!modal) render(); } });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && ok) load(true); });
 setInterval(() => { if (!document.hidden && ok) load(true); }, 120000);
 loadLocal();
