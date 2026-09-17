@@ -64,3 +64,11 @@ Inspirée des consoles Thomas (closing), Anaïs (Selfty), Lauric et Developpia (
 - **Aujourd'hui** : plan du mois (ventes, calls tenus et calls bookés nécessaires pour l'objectif), encaissements en retard, leads à vérifier.
 - **Heure de Paris** partout dans la page (Intl), quel que soit le fuseau du téléphone.
 - **Pont** : `call_upsert` (`create:true` pour un nouveau call, sinon jamais de ligne créée), `call_delete`, `brief_preview` (texte du brief et du message du soir, sans envoi). Telegram : vente enregistrée, brief 8 h calculé sur les calls (confirmations, follow-ups sur la table, jours sans vente sur 90 jours).
+
+## Périodes et non bookés (17/09/2026, soir)
+- **Périodes** partout (Aujourd'hui, Calls, Chiffres, Non bookés) : 7 jours, Semaine en cours (lundi → dimanche), 14 jours, Mois en cours, mois précédent, 3 mois, 6 mois, Tout, Autre mois. Flèches comparées à la période précédente de même longueur (semaine et mois en cours : arrêtées au même jour).
+- **Onglet Non bookés** : contacts iClosed qui ont commencé à réserver sans choisir de créneau (API `/v1/contacts`, statut POTENTIAL = formulaire commencé, QUALIFIED = qualifié sans créneau ; podcast, recrutement et tests exclus). Le pont crée une fiche statut `nonbooke` (id `ic<contactId>`) à chaque synchro, sans jamais toucher au statut d'une fiche existante. S'ils réservent, la fiche passe en call booké avec la note « a réservé (non booké, N relances) ».
+- Filtres : À relancer (arrivés il y a moins de 45 j jamais relancés, ou relance due), Relancés en attente, Anciens jamais relancés, Sans réponse (3 relances), Pas intéressés, Ont réservé, Tous ; profil (qualifié / formulaire), tri, recherche, période sur la date d'arrivée. WhatsApp ou mail prérempli (relance 1, relance 2, dernière relance, ancien), envoi un par un, « Pas intéressé », « Remettre à relancer ». Ligne dans Aujourd'hui › Remplir l'agenda et dans le brief Telegram de 8 h.
+- **Prix de l'offre** : Mentorat 90 jours · 5000 (réglages). Le plan du mois prend le panier des ventes des 90 derniers jours s'il y en a au moins 3, sinon le prix de l'offre.
+- Numéros « +330 6… » (0 saisi après l'indicatif) corrigés pour WhatsApp.
+- Pont : `contacts_preview` (GET) montre les non bookés qui seraient créés, sans rien écrire.

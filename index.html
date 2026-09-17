@@ -262,7 +262,7 @@ input[type=date].inp,input[type=datetime-local].inp{min-height:46px;-webkit-appe
 .plan{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border-radius:14px;margin:0 0 6px;border:1px dashed var(--bord);background:var(--panneau)}
 .plan b{font-size:14px}.plan span{font-size:13.5px;color:var(--muet)}.plan .hint{font-size:12px}
 .plan.row2{flex-direction:row;justify-content:space-between;align-items:center;gap:10px}
-.sec .btn{white-space:nowrap}
+.sec .btn,.fa-row .btn{white-space:nowrap}
 .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 /* fiche résultat */
 .rn-box.form{max-width:600px}
@@ -375,10 +375,10 @@ const CODE = 'lucas26';
 const SOURCES = [['linkedin', 'LinkedIn'], ['setter', 'Setter'], ['iclosed', 'iClosed'], ['live', 'Live'], ['lp', 'LP'], ['insta', 'Insta'], ['reco', 'Recommandation'], ['autre', 'Autre']];
 const STATUS = [
   ['a_appeler', 'À relancer', 's-todo'], ['booke', 'Call booké', 's-booke'], ['followup', 'Follow-up', 's-followup'],
-  ['vendu', 'Vendu', 's-vendu'], ['noshow', 'No-show', 's-noshow'], ['perdu', 'Perdu', 's-perdu'], ['fait', 'Call fait', 's-fait'], ['ancien', 'Ancien', ''], ['ecarte', 'Écarté', 's-ecarte'],
+  ['vendu', 'Vendu', 's-vendu'], ['noshow', 'No-show', 's-noshow'], ['perdu', 'Perdu', 's-perdu'], ['fait', 'Call fait', 's-fait'], ['nonbooke', 'Non booké', 's-todo'], ['ancien', 'Ancien', ''], ['ecarte', 'Écarté', 's-ecarte'],
 ];
 const OPEN = ['a_appeler', 'booke', 'followup', 'noshow', 'fait'];
-const TABS = [['today', "Aujourd'hui"], ['leads', 'Leads'], ['calls', 'Calls'], ['chiffres', 'Chiffres'], ['inscrits', 'Inscrits live']];
+const TABS = [['today', "Aujourd'hui"], ['leads', 'Leads'], ['calls', 'Calls'], ['nonbookes', 'Non bookés'], ['chiffres', 'Chiffres'], ['inscrits', 'Inscrits live']];
 const STEPS = [2, 3, 7]; // jours entre relance 1 → 2 → 3 → dernière
 // fiche résultat d'un call
 const SHOWS = [['present', 'Présent', ''], ['noshow', 'No-show', 'r'], ['reporte', 'Reporté', 'o'], ['annule', 'Annulé', 'm']];
@@ -402,7 +402,7 @@ const DISQUALIF = ['Pas de budget', 'Pas encore freelance', 'Pas la bonne cible'
 const DEFAULTS = {
   objectif_ca: '', objectif_ventes: '', show_vise: '70', closing_vise: '20', signature: 'Alex',
   iclosed: 'https://app.iclosed.io/e/lucasfabre/session-eval-mentorat',
-  offres: 'Mentorat 90 jours',
+  offres: 'Mentorat 90 jours · 5000',
   tpl: {
     confirm: "Salut {prenom}, c'est {signature} de Leads and Business. Je te confirme ton appel avec Lucas {quand}.\nLe lien : {visio}\nTu es toujours dispo ? Réponds-moi juste ici pour valider.",
     rappel: "Salut {prenom}, c'est {signature} de Leads and Business. Petit rappel : ton appel avec Lucas commence {quand}.\nLe lien : {visio}\nÀ tout de suite.",
@@ -415,9 +415,13 @@ const DEFAULTS = {
     reactivation: "Salut {prenom}, c'est {signature} de Leads and Business. Tu avais échangé avec Lucas il y a quelque temps. Où en es-tu aujourd'hui côté missions et revenus ? Si tu veux refaire le point, Lucas a quelques créneaux cette semaine : {iclosed}",
     reactivation_ns: "Salut {prenom}, c'est {signature} de Leads and Business. Tu avais pris rendez-vous avec Lucas il y a quelque temps. Où en es-tu aujourd'hui côté missions et revenus ? Si tu veux faire le point avec lui, réserve ton créneau ici : {iclosed}",
     live: "Salut {prenom}, c'est {signature} de Leads and Business. Merci pour ton inscription au live de Lucas. Tu veux qu'il regarde ton cas de près, en 30 min ? Réserve ton créneau ici : {iclosed}",
+    nonbooke: "Salut {prenom}, c'est {signature} de Leads and Business. Tu as commencé à réserver ton appel avec Lucas sans choisir de créneau. On le cale maintenant ? Prends celui qui t'arrange ici : {iclosed}",
+    nonbooke2: "Salut {prenom}, c'est {signature} de Leads and Business. Lucas a encore quelques créneaux cette semaine pour faire le point avec toi sur ton activité de freelance. Je t'en réserve un ? Sinon, choisis directement ici : {iclosed}",
+    nonbooke_fin: "Salut {prenom}, c'est {signature} de Leads and Business. Dernier message de ma part : l'appel avec Lucas, c'est toujours d'actualité pour toi ? Un oui ou un non me suffit.",
+    nonbooke_old: "Salut {prenom}, c'est {signature} de Leads and Business. Tu avais commencé à réserver un appel avec Lucas il y a quelque temps. Où en es-tu aujourd'hui côté missions et revenus ? Si tu veux faire le point avec lui, choisis ton créneau ici : {iclosed}",
   },
 };
-const TPL_LABELS = [['confirm', 'Confirmation du call (veille et jour J)'], ['rappel', 'Rappel 1 h avant le call'], ['noshow', 'No-show : recaler'], ['relance', 'Call annulé ou reporté : recaler'], ['followup', 'Follow-up · relance 1 (lendemain)'], ['followup2', "Follow-up · relance 2 (reprend l'objection)"], ['followup3', 'Follow-up · relance 3 (nouveau point)'], ['followup_fin', 'Follow-up · dernière relance'], ['reactivation', 'Réactivation · anciens leads vus en call'], ['reactivation_ns', 'Réactivation · no-shows, annulés, sans suite'], ['live', 'Inscrit au live']];
+const TPL_LABELS = [['confirm', 'Confirmation du call (veille et jour J)'], ['rappel', 'Rappel 1 h avant le call'], ['noshow', 'No-show : recaler'], ['relance', 'Call annulé ou reporté : recaler'], ['followup', 'Follow-up · relance 1 (lendemain)'], ['followup2', "Follow-up · relance 2 (reprend l'objection)"], ['followup3', 'Follow-up · relance 3 (nouveau point)'], ['followup_fin', 'Follow-up · dernière relance'], ['reactivation', 'Réactivation · anciens leads vus en call'], ['reactivation_ns', 'Réactivation · no-shows, annulés, sans suite'], ['live', 'Inscrit au live'], ['nonbooke', 'Non booké · relance 1'], ['nonbooke2', 'Non booké · relance 2'], ['nonbooke_fin', 'Non booké · dernière relance'], ['nonbooke_old', 'Non booké · ancien (plus de 45 jours)']];
 
 // ---------- état ----------
 let S = { leads: [], calls: [], inscrits: [], settings: {} };
@@ -427,8 +431,9 @@ let tab = (location.hash || '').replace('#', '') || 'today';
 let filter = 'tous', search = '';
 let expanded = new Set();
 let formOpen = false, formPrefill = null;
-let period = ''; // '' = mois en cours, 'AAAA-MM' ou 'all' (partagé par Aujourd'hui, Calls et Chiffres)
-const PREF_DEF = { sort: 'next', src: '', temp: '', cView: 'passes', cFilter: 'tous', cKind: 'ventes', cSort: 'recent' };
+let period = ''; // '' = mois en cours, 'w' semaine en cours, 'd7' / 'd14' derniers jours, 'm3' / 'm6' derniers mois, 'AAAA-MM' un mois, 'all' tout (partagé par Aujourd'hui, Calls et Chiffres)
+let nbPeriod = 'all', nbFilter = 'due', nbSearch = '', nbLimit = 60; // onglet Non bookés (période sur la date d'arrivée)
+const PREF_DEF = { sort: 'next', src: '', temp: '', cView: 'passes', cFilter: 'tous', cKind: 'ventes', cSort: 'recent', nbSort: 'recent', nbQual: '' };
 let prefs = readPrefs();
 let callSearch = '', callsLimit = 60, leadsLimit = 120;
 let inscritsLoaded = false, inscritsBusy = false;
@@ -483,7 +488,7 @@ function ratio(a, b, min = 1) { return b >= min ? a / b : null; }
 function sumOf(arr, k) { return arr.reduce((s, x) => s + (Number(x[k]) || 0), 0); }
 function num(v) { if (v === '' || v == null) return ''; const n = Number(String(v).replace(/[\s €]/g, '').replace(',', '.')); return isNaN(n) ? '' : n; }
 function plural(n, s, p) { return n + ' ' + (n > 1 ? (p || s + 's') : s); }
-function phoneDigits(p) { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.length === 10 && d.startsWith('0')) d = '33' + d.slice(1); return d; }
+function phoneDigits(p) { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.length === 10 && d.startsWith('0')) d = '33' + d.slice(1); if (d.length === 12 && d.startsWith('330')) d = '33' + d.slice(3); return d; }
 function newId(p = 'l') { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function stLabel(s) { const x = STATUS.find(a => a[0] === s); return x ? x[1] : s; }
 function stCls(s) { const x = STATUS.find(a => a[0] === s); return x ? x[2] : ''; }
@@ -779,6 +784,22 @@ function reactKind(l) { return talked(l) ? 'reactivation' : 'reactivation_ns'; }
 function isClient(l) { return l.status === 'vendu' || callsOfLead(l.id).some(c => cKind(c) === 'client'); }
 function reactivables() { return S.leads.filter(l => l.status === 'ancien' && !isClient(l) && phoneDigits(l.phone) && /follow|no-show|sans résultat|annulé/i.test(l.ic_result) && !l.last_touch).sort((a, b) => (/follow/i.test(b.ic_result) - /follow/i.test(a.ic_result)) || String(b.call_at).localeCompare(String(a.call_at))); }
 function inscritsSansFiche() { return S.inscrits.filter(i => (i.email || i.tel) && !leadFor(i)); }
+// ---------- non bookés iClosed : formulaire de réservation commencé, aucun créneau choisi ----------
+const NB_RECENT = 45; // jours : au-delà, un non booké jamais relancé passe dans « anciens »
+function isNb(l) { return l.status === 'nonbooke'; }
+function nbBooked(l) { return /a réservé \(non booké/.test(l.notes); }
+function nbQualified(l) { return /qualifi/i.test(l.ic_result); }
+function nbState(l) {
+  if (!isNb(l)) return nbBooked(l) ? 'booke' : ['perdu', 'ecarte'].includes(l.status) ? 'clos' : 'autre';
+  const n = Number(l.touches) || 0;
+  if (n >= 3) return 'sansreponse';
+  if (!n) return String(l.created).slice(0, 10) >= addDays(TODAY(), -NB_RECENT) ? 'due' : 'old';
+  return l.next_at && l.next_at <= TODAY() ? 'due' : 'attente';
+}
+function nbList() { return S.leads.filter(l => isNb(l) || l.ic_status === 'nonbooke' || nbBooked(l)); }
+const nbOrder = (a, b) => (nbQualified(b) - nbQualified(a)) || String(b.created).localeCompare(String(a.created));
+function nbToRelance() { return S.leads.filter(l => isNb(l) && nbState(l) === 'due').sort(nbOrder); }
+function nbOld() { return S.leads.filter(l => isNb(l) && nbState(l) === 'old').sort(nbOrder); }
 // un call à venir, ou passé depuis moins de 30 jours et pas encore rempli
 function pendingCall(l) { const lim = addDays(TODAY(), -30); return !!nextCallOf(l.id) || callsOfLead(l.id).some(c => isSale(c) && !isCancel(c) && !c.show && c.call_at.slice(0, 10) >= lim); }
 // fiches qui passent entre les mailles
@@ -815,11 +836,25 @@ function cashIn(id) {
 }
 
 // ---------- stats (calculées sur les calls) ----------
-function perRange(p) { return p === 'all' ? { all: true } : { from: p + '-01', to: p + '-31' }; }
+function mondayOf(iso) { const d = new Date(iso + 'T12:00:00'); return addDays(iso, -((d.getDay() + 6) % 7)); }
+const ROLL_DAYS = { d7: 7, d14: 14 }, ROLL_MONTHS = { m3: 3, m6: 6 };
+function perRange(p) {
+  const t = TODAY();
+  if (p === 'all') return { all: true };
+  if (p === 'w') { const m = mondayOf(t); return { from: m, to: addDays(m, 6) }; }
+  if (ROLL_DAYS[p]) return { from: addDays(t, -(ROLL_DAYS[p] - 1)), to: t };
+  if (ROLL_MONTHS[p]) return { from: addDays(addMonths(t, -ROLL_MONTHS[p]), 1), to: t };
+  return { from: p + '-01', to: p + '-31' };
+}
+// période précédente de même longueur (arrêtée à la même date pour la semaine et le mois en cours)
 function prevRange(p) {
+  const t = TODAY();
   if (p === 'all') return null;
-  const pk = monthShift(p, -1), cur = monthKey(TODAY());
-  return p === cur ? { from: pk + '-01', to: pk + '-' + pad(Math.min(Number(TODAY().slice(8, 10)), dimOf(pk))) } : { from: pk + '-01', to: pk + '-31' };
+  if (p === 'w') return { from: addDays(mondayOf(t), -7), to: addDays(t, -7) };
+  if (ROLL_DAYS[p]) { const n = ROLL_DAYS[p]; return { from: addDays(t, -(2 * n - 1)), to: addDays(t, -n) }; }
+  if (ROLL_MONTHS[p]) { const n = ROLL_MONTHS[p]; return { from: addDays(addMonths(t, -2 * n), 1), to: addMonths(t, -n) }; }
+  const pk = monthShift(p, -1), cur = monthKey(t);
+  return p === cur ? { from: pk + '-01', to: pk + '-' + pad(Math.min(Number(t.slice(8, 10)), dimOf(pk))) } : { from: pk + '-01', to: pk + '-31' };
 }
 function inRange(iso, r) { if (!iso) return false; if (r.all) return true; const d = String(iso).slice(0, 10); return d >= r.from && d <= r.to; }
 function stats(r) {
@@ -848,7 +883,13 @@ function stats(r) {
 }
 function curKey() { return monthKey(TODAY()); }
 function perKey() { return period === 'all' ? 'all' : (period || curKey()); }
-function perLabel(p) { return p === 'all' ? 'depuis le début' : p === curKey() ? moisNom(p).toLowerCase() : moisNom(p); }
+const PER_LABELS = { w: 'semaine en cours', d7: '7 derniers jours', d14: '14 derniers jours', m3: '3 derniers mois', m6: '6 derniers mois', all: 'depuis le début' };
+const PER_PREV = { w: 'la semaine dernière au même jour', d7: 'les 7 jours précédents', d14: 'les 14 jours précédents', m3: 'les 3 mois précédents', m6: 'les 6 mois précédents' };
+function isMonthKey(p) { return /^\d{4}-\d{2}$/.test(p); }
+function perLabel(p) { return PER_LABELS[p] || (p === curKey() ? moisNom(p).toLowerCase() : moisNom(p)); }
+function cmpLabel(p) { return PER_PREV[p] || (p === curKey() ? 'le mois dernier à la même date' : moisNom(monthShift(p, -1)).toLowerCase()); }
+// la période continue après aujourd'hui : la comparaison des calls bookés s'arrête à aujourd'hui
+function cutToday(p) { return p === curKey() || p === 'w'; }
 function monthsWithData() {
   const set = new Set([curKey()]);
   S.calls.forEach(c => { if (vis(c) && isSale(c) && c.call_at) set.add(monthKey(c.call_at)); });
@@ -856,13 +897,12 @@ function monthsWithData() {
   return [...set].filter(k => /^\d{4}-\d{2}$/.test(k) && k <= curKey()).sort().reverse();
 }
 function setPeriod(k) { if (!k) return; period = k === curKey() ? '' : k; callsLimit = 60; render(); }
-function periodBar() {
-  const cur = curKey(), sel = perKey();
-  const prev = [monthShift(cur, -1), monthShift(cur, -2)];
-  const others = monthsWithData().filter(k => k !== cur && !prev.includes(k));
-  const b = (k, lb) => `<button class="${sel === k ? 'on' : ''}" onclick="setPeriod('${k}')">${lb}</button>`;
+function periodBar(sel = perKey(), setter = 'setPeriod', months = monthsWithData()) {
+  const cur = curKey(), prev = monthShift(cur, -1);
+  const others = months.filter(k => k !== cur && k !== prev);
+  const b = (k, lb) => `<button class="${sel === k ? 'on' : ''}" onclick="${setter}('${k}')">${lb}</button>`;
   const selOn = others.includes(sel);
-  return `<div class="per"><span class="lab">Période</span>${b(cur, 'Mois en cours')}${prev.map(k => b(k, moisNom(k))).join('')}${b('all', 'Tout')}${others.length ? `<select class="${selOn ? 'on' : ''}" onchange="setPeriod(this.value)" aria-label="Autre mois"><option value="" disabled ${selOn ? '' : 'selected'}>Autre mois</option>${others.map(k => `<option value="${k}" ${sel === k ? 'selected' : ''}>${moisNom(k)}</option>`).join('')}</select>` : ''}</div>`;
+  return `<div class="per"><span class="lab">Période</span>${b('d7', '7 jours')}${b('w', 'Semaine en cours')}${b('d14', '14 jours')}${b(cur, 'Mois en cours')}${b(prev, moisNom(prev))}${b('m3', '3 mois')}${b('m6', '6 mois')}${b('all', 'Tout')}${others.length ? `<select class="${selOn ? 'on' : ''}" onchange="${setter}(this.value)" aria-label="Autre mois"><option value="" disabled ${selOn ? '' : 'selected'}>Autre mois</option>${others.map(k => `<option value="${k}" ${sel === k ? 'selected' : ''}>${moisNom(k)}</option>`).join('')}</select>` : ''}</div>`;
 }
 function delta(cur, prev, kind) {
   if (cur === null || cur === undefined || prev === null || prev === undefined) return '';
@@ -880,9 +920,11 @@ function planRates() {
   const show = real ? Math.max(r90.show, 0.3) : (Number(c.show_vise) || 70) / 100;
   const closing = real ? Math.max(r90.closing || 0, 0.05) : (Number(c.closing_vise) || 20) / 100;
   const sold = S.leads.filter(l => l.status === 'vendu' && Number(l.price) > 0);
+  const recent = sold.filter(l => l.sold_at >= addDays(TODAY(), -90));
   const offerP = offers().map(o => Number(o.price) || 0).find(Boolean) || 0;
-  const panier = sold.length ? sumOf(sold, 'price') / sold.length : offerP;
-  return { show, closing, panier, real };
+  const panier = recent.length >= 3 ? sumOf(recent, 'price') / recent.length : offerP || (sold.length ? sumOf(sold, 'price') / sold.length : 0);
+  const panierSrc = recent.length >= 3 ? 'ventes des 90 derniers jours' : offerP ? "prix de l'offre" : 'ventes passées';
+  return { show, closing, panier, panierSrc, real };
 }
 
 // ================= RENDU =================
@@ -906,15 +948,17 @@ function render() {
   const nToday = toFill().length + relances().length + upcoming().filter(c => c.call_at.slice(0, 10) === t && isSale(c) && c.conf_reply !== 'ok').length + duePayments().length;
   const nUp = upcoming().filter(isSale).length;
   const nIns = inscritsSansFiche().length;
+  const nNb = nbToRelance().length;
   $('#tabs').innerHTML = TABS.map(([id, lbl]) => {
     let b = '';
+    if (id === 'nonbookes' && nNb) b = `<span class="badge">${nNb}</span>`;
     if (id === 'today' && nToday) b = `<span class="badge alert">${nToday}</span>`;
     if (id === 'calls' && nUp) b = `<span class="badge">${nUp}</span>`;
     if (id === 'inscrits' && nIns) b = `<span class="badge">${nIns}</span>`;
     return `<button class="${id === tab ? 'on' : ''}" onclick="showTab('${id}')">${lbl}${b}</button>`;
   }).join('');
   $('#fab').hidden = !(tab === 'leads' && !formOpen);
-  const V = { today: vToday, leads: vLeads, calls: vCalls, chiffres: vChiffres, inscrits: vInscrits };
+  const V = { today: vToday, leads: vLeads, calls: vCalls, nonbookes: vNonbookes, chiffres: vChiffres, inscrits: vInscrits };
   $('#main').innerHTML = V[tab]();
 }
 function showModal() { $('#runner').hidden = false; }
@@ -925,14 +969,13 @@ function kpiTiles() {
   const c = cfg(), t = TODAY(), cur = curKey(), p = perKey();
   const st = stats(perRange(p));
   const pr = prevRange(p), ps = pr ? stats(pr) : null;
-  const isCur = p === cur, isMonth = p !== 'all';
+  const isCur = p === cur, isMonth = isMonthKey(p);
   const day = Number(t.slice(8, 10)), dim = dimOf(cur);
   const objCa = isMonth ? Number(c.objectif_ca) || 0 : 0, objV = isMonth ? Number(c.objectif_ventes) || 0 : 0;
   const frac = isCur ? day / dim : 1;
   const proj = isCur && day > 1 ? Math.round(st.ca / day * dim) : st.ca;
   const col = (v, g, o) => v === null ? 'm' : v >= g ? 'g' : v >= o ? 'o' : 'r';
   const bar = (v, max) => max ? `<div class="bar"><i style="width:${Math.min(100, Math.round(100 * v / max))}%"></i></div>` : '';
-  const vs = ps ? (isCur ? ' vs même date ' + moisNom(monthShift(cur, -1)).toLowerCase() : ' vs ' + moisNom(monthShift(p, -1)).toLowerCase()) : '';
   const caSub = objCa ? `objectif ${euro(objCa)}${isCur ? ' · projection ' + euro(proj) : ''}` : isCur ? `<a href="#" onclick="event.stopPropagation();openSettings();return false">fixer un objectif</a>` : `encaissé ${euro(st.cash)}`;
   const blank = st.blank.length ? ` · <a href="#" onclick="event.stopPropagation();goCalls('todo');return false">${st.blank.length} non rempli${st.blank.length > 1 ? 's' : ''}</a>` : '';
   const d = ps ? [delta(st.ca, ps.ca, 'eur'), delta(st.ventes.length, ps.ventes.length), delta(st.show, ps.show, 'rate'), delta(st.closing, ps.closing, 'rate')] : ['', '', '', ''];
@@ -941,7 +984,7 @@ function kpiTiles() {
     <div class="kpi click" onclick="goCalls('vendu')"><div class="v ${objV ? (st.ventes.length >= objV * frac ? 'g' : 'o') : 'g'}">${st.ventes.length}${objV ? '<small> / ' + objV + '</small>' : ''}</div><div class="l">Ventes</div>${bar(st.ventes.length, objV)}<div class="s">${plural(st.tenus.length, 'call tenu', 'calls tenus')}${d[1]}</div></div>
     <div class="kpi click" onclick="goCalls('noshow')"><div class="v ${col(st.show, 0.7, 0.55)}">${pc(st.show)}</div><div class="l">Show-up</div><div class="s">${plural(st.noshow.length, 'no-show')}${blank}${d[2]}</div></div>
     <div class="kpi click" onclick="goCalls('followup')"><div class="v ${col(st.closing, 0.25, 0.15)}">${pc(st.closing)}</div><div class="l">Closing</div><div class="s">ventes / calls tenus${st.pitches.length && st.nq.length ? ' · ' + pc(st.closingP) + ' sur pitchés' : ''}${d[3]}</div></div>
-  </div>${vs && d.some(Boolean) ? `<div class="count-line">Flèches${esc(vs)}</div>` : ''}`;
+  </div>${ps && d.some(Boolean) ? `<div class="count-line">Flèches : comparaison avec ${esc(cmpLabel(p))}.</div>` : ''}`;
 }
 function goulot() {
   const st = stats(perRange(curKey()));
@@ -952,7 +995,10 @@ function goulot() {
   if (rl >= 5) return ['r', `${rl} relances en attente`, 'Lance « Envoyer un par un » : un message, suivant, 5 minutes pour tout vider.', `<button class="btn sm" onclick="startRunner('rel')">Envoyer un par un</button>`];
   if (st.show !== null && st.tenus.length + st.noshow.length >= 4 && st.show < 0.6) return ['o', `Show-up à ${pc(st.show)}`, 'Confirme chaque call la veille et 1 h avant, note sa réponse, et recale un no-show le jour même.', ''];
   if (st.closing !== null && st.tenus.length >= 5 && st.closing < 0.2) return ['o', `Closing à ${pc(st.closing)}`, "Regarde les objections dans Chiffres : chaque relance follow-up reprend l'objection du call.", ''];
-  if (up7 < 3) return ['o', `Seulement ${plural(up7, 'call')} sur 7 jours`, `Réactive les anciens leads (${reactivables().length} à contacter) et les inscrits au live sans fiche.`, reactivables().length ? `<button class="btn sm" onclick="startRunner('react')">Réactiver un par un</button>` : ''];
+  if (up7 < 3) {
+    const nb = nbToRelance().filter(l => phoneDigits(l.phone)).length, re = reactivables().length;
+    return ['o', `Seulement ${plural(up7, 'call')} sur 7 jours`, `Relance les non bookés iClosed (${nb} à relancer), réactive les anciens leads (${re}) et les inscrits au live sans fiche.`, nb ? `<button class="btn sm" onclick="startRunner('nb')">Relancer les non bookés</button>` : re ? `<button class="btn sm" onclick="startRunner('react')">Réactiver un par un</button>` : ''];
+  }
   const obj = Number(cfg().objectif_ca) || 0, day = Number(TODAY().slice(8, 10)), dim = dimOf(curKey());
   if (obj && st.ca < obj * day / dim) return ['o', "En retard sur l'objectif du mois", `Il manque ${euro(obj * day / dim - st.ca)} au rythme prévu : priorité aux follow-ups chauds.`, ''];
   return ['g', 'Rien ne coince', 'Garde le rythme : confirmer, remplir, relancer.', ''];
@@ -971,7 +1017,7 @@ function planMois() {
   const fu = S.leads.filter(l => l.status === 'followup');
   return `<div class="plan"><b>Plan pour ${euro(obj)} ce mois-ci</b>
     <span>Il manque ${euro(reste)} : ${plural(ventes, 'vente')} ≈ ${plural(tenus, 'call tenu', 'calls tenus')} ≈ ${plural(bookes, 'call booké', 'calls bookés')}. ${plural(prevus, 'call déjà prévu', 'calls déjà prévus')}, ${Math.max(0, bookes - prevus)} à trouver en ${plural(jours, 'jour')}.${fu.length ? ` ${plural(fu.length, 'follow-up ouvert', 'follow-ups ouverts')} à closer en priorité.` : ''}</span>
-    <span class="hint">Calcul : panier ${euro(r.panier)}, show-up ${pc(r.show)}, closing ${pc(r.closing)} (${r.real ? '90 derniers jours' : 'taux visés des réglages'}).</span></div>`;
+    <span class="hint">Calcul : panier ${euro(r.panier)} (${r.panierSrc}), show-up ${pc(r.show)} et closing ${pc(r.closing)} (${r.real ? '90 derniers jours' : 'taux visés des réglages'}).</span></div>`;
 }
 function vToday() {
   const t = TODAY(), tm = addDays(t, 1);
@@ -998,8 +1044,10 @@ function vToday() {
     if (ob.noamount.length) html += `<div class="fa-row"><div><b>${plural(ob.noamount.length, 'vente')} sans montant</b><span class="hint">Le CA et le panier moyen sont faux sans le montant</span></div><button class="btn sec2 sm" onclick="goLeads('noamount')">Voir</button></div>`;
     html += `</div>`;
   }
-  if (ins.length || react.length) {
+  const nbDue = nbToRelance();
+  if (ins.length || react.length || nbDue.length) {
     html += `<div class="sec">Remplir l'agenda</div><div class="card fill-agenda">`;
+    if (nbDue.length) html += `<div class="fa-row"><div><b>${plural(nbDue.length, 'non booké', 'non bookés')} iClosed à relancer</b><span class="hint">Ont commencé à réserver sans choisir de créneau</span></div><span style="display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end"><button class="btn sec2 sm" onclick="showTab('nonbookes')">Voir</button>${nbDue.some(l => phoneDigits(l.phone)) ? `<button class="btn sm" onclick="startRunner('nb')">Un par un</button>` : ''}</span></div>`;
     if (ins.length) html += `<div class="fa-row"><div><b>${plural(ins.length, 'inscrit')} au live sans fiche</b><span class="hint">Leur proposer un appel avec Lucas</span></div><button class="btn sec2 sm" onclick="showTab('inscrits')">Voir</button></div>`;
     if (react.length) html += `<div class="fa-row"><div><b>${plural(react.length, 'ancien lead', 'anciens leads')} à réactiver</b><span class="hint">Follow-ups, no-shows et calls sans suite de plus de 45 j, un message adapté à chacun</span></div><button class="btn sec2 sm" onclick="startRunner('react')">Un par un</button></div>`;
     html += `</div>`;
@@ -1071,7 +1119,7 @@ function relCard(l) {
     ${last ? `<div class="recap">Dernier call ${esc(fmtDate(last.call_at))} : ${esc(resLabel(last))}${last.reason ? ' · ' + esc(last.reason) : last.notes ? ' · ' + esc(last.notes) : ''}</div>` : ''}
     <div class="actions">${phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp · ${esc(tplShort(k))}</button>` : `<span class="hint q">pas de numéro</span><button class="btn sm sec2" onclick="touched('${l.id}')">Relance faite</button>`}<button class="btn sm sec2" onclick="snooze('${l.id}',2)">+2 j</button><button class="btn sm sec2" onclick="rebook('${l.id}')">Rebooké</button><button class="btn sm danger" onclick="closeLead('${l.id}')">Perdu</button></div></div>`;
 }
-const TPL_SHORT = { confirm: 'confirmation', rappel: 'rappel 1 h avant', noshow: 'recaler', relance: 'recaler', followup: 'relance 1', followup2: 'relance 2', followup3: 'relance 3', followup_fin: 'dernière relance', reactivation: 'réactivation', reactivation_ns: 'réactivation', live: 'proposer un appel' };
+const TPL_SHORT = { confirm: 'confirmation', rappel: 'rappel 1 h avant', noshow: 'recaler', relance: 'recaler', followup: 'relance 1', followup2: 'relance 2', followup3: 'relance 3', followup_fin: 'dernière relance', reactivation: 'réactivation', reactivation_ns: 'réactivation', live: 'proposer un appel', nonbooke: 'relance 1', nonbooke2: 'relance 2', nonbooke_fin: 'dernière relance', nonbooke_old: 'relance' };
 function tplShort(k) { return TPL_SHORT[k] || k; }
 function snooze(id, n) { patch(id, { next_at: addDays(TODAY(), n) }); toast('Reporté au ' + fmtDate(addDays(TODAY(), n))); }
 function rebook(id) {
@@ -1098,6 +1146,7 @@ function payRow(l, p) {
 function kindOf(l) {
   const nxt = nextCallOf(l.id);
   if (nxt) return plusMin(nowLocal(), 120) >= nxt.call_at ? 'rappel' : 'confirm';
+  if (isNb(l)) { const n = Number(l.touches) || 0; return n >= 2 ? 'nonbooke_fin' : n === 1 ? 'nonbooke2' : nbState(l) === 'old' ? 'nonbooke_old' : 'nonbooke'; }
   if (l.status === 'noshow') return 'noshow';
   if (l.status === 'followup' || l.status === 'fait') { const n = Number(l.touches) || 0; return n <= 0 ? 'followup' : n === 1 ? 'followup2' : n === 2 ? 'followup3' : 'followup_fin'; }
   if (l.status === 'ancien' || /réactiv/i.test(l.next_action)) return reactKind(l);
@@ -1152,15 +1201,27 @@ function sendWa(id, kind, customText, callId) {
   }
   touched(id, !!runner);
 }
+// e-mail prérempli (pour les leads sans numéro, ou en complément) : compte comme une relance
+function sendMail(id, kind) {
+  const l = IX.lead[id]; if (!l) return;
+  const to = String(l.email || '').trim();
+  if (!to) { toast("Pas d'e-mail sur cette fiche", true); return; }
+  const k = kind || kindOf(l);
+  location.href = `mailto:${to}?subject=${encodeURIComponent('Ton appel avec Lucas')}&body=${encodeURIComponent(msgFor(l, k))}`;
+  if (k !== 'confirm' && k !== 'rappel') touched(id);
+}
 function touched(id, silent) {
   const l = IX.lead[id]; if (!l) return;
   const n = (Number(l.touches) || 0) + 1, t = TODAY();
   const ch = { touches: n, last_touch: t };
   if (l.status === 'ancien') ch.status = 'a_appeler';
-  if (n > STEPS.length) { ch.next_at = addDays(t, 7); ch.next_action = `${n} relances sans suite : passer en perdu ?`; }
+  if (isNb(l)) {
+    if (n >= 3) { ch.next_at = ''; ch.next_action = 'Sans réponse après 3 relances'; }
+    else { ch.next_at = addDays(t, STEPS[n - 1]); ch.next_action = 'Relance non booké ' + (n + 1); }
+  } else if (n > STEPS.length) { ch.next_at = addDays(t, 7); ch.next_action = `${n} relances sans suite : passer en perdu ?`; }
   else { ch.next_at = addDays(t, STEPS[n - 1]); ch.next_action = (l.status === 'ancien' || /réactiv/i.test(l.next_action) ? 'Réactivation' : l.status === 'noshow' ? 'Recaler le call' : l.status === 'followup' ? 'Relance follow-up' : 'Relance') + ' ' + (n + 1); }
   patch(id, ch, { silent });
-  if (!silent) toast(`Relance ${n} notée · prochaine ${dayLabel(ch.next_at)}`);
+  if (!silent) toast(`Relance ${n} notée${ch.next_at ? ' · prochaine ' + dayLabel(ch.next_at) : ''}`);
 }
 
 // ================= FICHE RÉSULTAT DU CALL =================
@@ -1353,10 +1414,12 @@ async function delCall(id) {
 }
 
 // ================= ENVOI WHATSAPP UN PAR UN =================
+const RUNNERS = { rel: ['Relances du jour', () => relances()], react: ['Réactivation', () => reactivables()], nb: ['Non bookés à relancer', () => nbToRelance()], nbold: ['Non bookés anciens', () => nbOld()] };
 function startRunner(kind) {
-  const ids = (kind === 'react' ? reactivables() : relances()).filter(l => phoneDigits(l.phone)).map(l => l.id);
+  const [title, src] = RUNNERS[kind] || RUNNERS.rel;
+  const ids = src().filter(l => phoneDigits(l.phone)).map(l => l.id);
   if (!ids.length) { toast('Personne à contacter avec un numéro', true); return; }
-  runner = { kind, title: kind === 'react' ? 'Réactivation' : 'Relances du jour', ids, i: 0, done: 0, opened: false };
+  runner = { kind, title, ids, i: 0, done: 0, opened: false };
   modal = 'wa'; showModal(); renderRunner();
 }
 function renderRunner() {
@@ -1374,7 +1437,7 @@ function renderRunner() {
     <div class="rn-top"><b>${r.title} · ${r.i + 1} / ${r.ids.length}</b><button class="icon" onclick="closeModal()">✕</button></div>
     <div class="bar"><i style="width:${Math.round(100 * r.i / r.ids.length)}%"></i></div>
     <div class="name" style="margin-top:12px">${esc(l.name)}</div>
-    <div class="chips">${l.call_at ? `<span class="chip">Call ${esc(fmtDT(l.call_at))}</span>` : ''}${last ? `<span class="chip">${esc(resLabel(last))}</span>` : l.ic_result ? `<span class="chip">${esc(l.ic_result)}</span>` : ''}${l.touches ? `<span class="chip mono">${plural(l.touches, 'relance')}</span>` : ''}${l.objection ? `<span class="chip o">${esc(l.objection)}</span>` : ''}</div>
+    <div class="chips">${isNb(l) ? `<span class="chip ${nbQualified(l) ? 'v' : ''}">${esc(l.ic_result || 'Non booké')}</span>${l.ic_event ? `<span class="chip">${esc(l.ic_event)}</span>` : ''}<span class="chip mono">arrivé ${esc(ago(l.created))}</span>${l.touches ? `<span class="chip mono">${plural(l.touches, 'relance')}</span>` : ''}` : ''}${l.call_at ? `<span class="chip">Call ${esc(fmtDT(l.call_at))}</span>` : ''}${last ? `<span class="chip">${esc(resLabel(last))}</span>` : l.ic_result && !isNb(l) ? `<span class="chip">${esc(l.ic_result)}</span>` : ''}${l.touches && !isNb(l) ? `<span class="chip mono">${plural(l.touches, 'relance')}</span>` : ''}${l.objection ? `<span class="chip o">${esc(l.objection)}</span>` : ''}</div>
     ${l.need ? `<div class="need open">${esc(l.need)}</div>` : ''}
     <span class="lbl">Message · ${esc(tplShort(kind))} (modifiable)</span>
     <textarea class="inp tall" id="rn-msg">${esc(msgFor(l, kind))}</textarea>
@@ -1396,12 +1459,12 @@ function runnerSent() { const r = runner; touched(r.ids[r.i], true); r.done++; r
 function runnerNext() { runner.i++; runner.opened = false; renderRunner(); }
 
 // ================= LEADS =================
-const FILTERS = [['tous', 'En cours'], ['late', 'Relances dues'], ['followup', 'Follow-up'], ['booke', 'Call booké'], ['a_appeler', 'À relancer'], ['noshow', 'No-show'], ['vendu', 'Vendu'], ['perdu', 'Perdu'], ['react', 'À réactiver'], ['ancien', 'Anciens'], ['ecarte', 'Écartés']];
+const FILTERS = [['tous', 'En cours'], ['late', 'Relances dues'], ['followup', 'Follow-up'], ['booke', 'Call booké'], ['a_appeler', 'À relancer'], ['noshow', 'No-show'], ['vendu', 'Vendu'], ['perdu', 'Perdu'], ['react', 'À réactiver'], ['nonbooke', 'Non bookés'], ['ancien', 'Anciens'], ['ecarte', 'Écartés']];
 const FILTERS_CHECK = [['nonext', 'Sans prochaine action'], ['nophone', 'Sans numéro'], ['noamount', 'Vente sans montant']];
 const SORTS = [['next', 'Tri : prochaine action'], ['call', 'Tri : dernier call'], ['recent', 'Tri : plus récents'], ['score', 'Tri : qualif'], ['price', 'Tri : montant'], ['name', 'Tri : nom']];
 function filterFn(f) {
   const t = TODAY();
-  if (f === 'tous') return l => !['ancien', 'perdu', 'ecarte'].includes(l.status);
+  if (f === 'tous') return l => !['ancien', 'perdu', 'ecarte', 'nonbooke'].includes(l.status);
   if (f === 'late') return l => l.next_at && l.next_at <= t && OPEN.includes(l.status);
   if (f === 'react') { const ids = new Set(reactivables().map(l => l.id)); return l => ids.has(l.id); }
   if (['nonext', 'nophone', 'noamount'].includes(f)) { const ids = new Set(oublies()[f].map(l => l.id)); return l => ids.has(l.id); }
@@ -1471,6 +1534,7 @@ function leadSummary(l) {
   const chips = [];
   if (l.source) chips.push(`<span class="chip">${esc(srcLabel(l.source))}</span>`);
   if (l.status !== 'vendu' && isClient(l)) chips.push('<span class="chip v">Client (séances)</span>');
+  if (isNb(l)) chips.push(`<span class="chip ${nbQualified(l) ? 'v' : ''}">${esc(l.ic_result || 'Non booké')}</span><span class="chip mono">arrivé ${esc(ago(l.created))}</span>`);
   const calls = callsOfLead(l.id);
   const nxt = nextCallOf(l.id);
   const last = calls.filter(c => ended(c) || c.show).pop();
@@ -1705,6 +1769,92 @@ function pastCard(c) {
     <div class="actions"><button class="btn sm ${!c.show && !isCancel(c) ? '' : 'sec2'}" onclick="openCall('${c.id}')">${!c.show && !isCancel(c) ? 'Remplir' : 'Modifier'}</button>${phone && l && OPEN.includes(l.status) && (c.show || isCancel(c)) ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp · ${esc(tplShort(kindOf(l)))}</button>` : ''}${l ? `<button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button>` : ''}</div></div>`;
 }
 
+// ================= NON BOOKÉS iCLOSED =================
+const NB_FILTERS = [['due', 'À relancer'], ['attente', 'Relancés, en attente'], ['old', 'Anciens jamais relancés'], ['sansreponse', 'Sans réponse'], ['clos', 'Pas intéressés'], ['booke', 'Ont réservé'], ['tous', 'Tous']];
+const NB_SORTS = [['recent', 'Tri : plus récents'], ['old', 'Tri : plus anciens'], ['qualif', "Tri : qualifiés d'abord"], ['next', 'Tri : prochaine relance'], ['name', 'Tri : nom']];
+function setNbPeriod(k) { if (!k) return; nbPeriod = k; nbLimit = 60; render(); }
+function setNbFilter(f) { nbFilter = f; nbLimit = 60; render(); }
+function nbMonths() {
+  const set = new Set([curKey()]);
+  nbList().forEach(l => { if (l.created) set.add(monthKey(l.created)); });
+  return [...set].filter(k => isMonthKey(k) && k <= curKey()).sort().reverse();
+}
+function nbBase() {
+  const r = perRange(nbPeriod);
+  return nbList().filter(l => (nbPeriod === 'all' || inRange(l.created, r)) && (!prefs.nbQual || (prefs.nbQual === 'q') === nbQualified(l)));
+}
+function vNonbookes() {
+  const base = nbBase();
+  const due = base.filter(l => nbState(l) === 'due'), old = base.filter(l => nbState(l) === 'old');
+  const booked = nbList().filter(nbBooked), afterRelance = booked.filter(l => !/sans relance\)/.test(l.notes));
+  let html = `<p class="hint" style="margin:0 2px 12px">Ont commencé à réserver un appel sur iClosed sans choisir de créneau. Ils quittent la liste dès qu'ils réservent (synchro iClosed toutes les 15 min)${booked.length ? ` · <b>${plural(booked.length, 'a réservé', 'ont réservé')} depuis, dont ${afterRelance.length} après une relance</b>` : ''}.</p>`;
+  html += periodBar(nbPeriod, 'setNbPeriod', nbMonths());
+  html += `<div class="filters">
+    <div class="toolbar"><input class="inp grow" type="search" placeholder="Rechercher : nom, e-mail, numéro" value="${esc(nbSearch)}" oninput="nbSearch=this.value;nbLimit=60;renderNbList()">
+      <select class="inp" onchange="setPref('nbQual',this.value);render()" aria-label="Profil"><option value="">Tous les profils</option><option value="q" ${prefs.nbQual === 'q' ? 'selected' : ''}>Qualifiés, sans créneau</option><option value="f" ${prefs.nbQual === 'f' ? 'selected' : ''}>Formulaire commencé</option></select>
+      <select class="inp" onchange="setPref('nbSort',this.value);renderNbList()" aria-label="Tri">${NB_SORTS.map(([k, lb]) => `<option value="${k}" ${prefs.nbSort === k ? 'selected' : ''}>${lb}</option>`).join('')}</select></div>
+    <div class="pills">${NB_FILTERS.map(([k, lb]) => { const n = k === 'tous' ? base.length : base.filter(l => nbState(l) === k).length; return `<button class="${nbFilter === k ? 'on' : ''} ${n ? '' : 'zero'}" onclick="setNbFilter('${k}')">${lb} <span class="c">${n}</span></button>`; }).join('')}</div></div>`;
+  const runKind = nbFilter === 'due' ? 'nb' : nbFilter === 'old' ? 'nbold' : '';
+  const runList = runKind === 'nb' ? due : runKind === 'nbold' ? old : [];
+  const withPhone = runList.filter(l => phoneDigits(l.phone)).length;
+  if (runKind && withPhone) html += `<div class="row" style="margin:0 0 10px"><span class="hint">${plural(withPhone, 'lead joignable', 'leads joignables')} sur WhatsApp${runList.length > withPhone ? `, ${runList.length - withPhone} par mail seulement` : ''}</span><button class="btn sm" onclick="startRunner('${runKind}')">Envoyer un par un</button></div>`;
+  return html + `<div id="nblist">${nbListHtml()}</div>`;
+}
+function renderNbList() { const el = $('#nblist'); if (el) el.innerHTML = nbListHtml(); }
+function nbListHtml() {
+  const q = nbSearch.trim().toLowerCase();
+  let arr = nbBase();
+  if (nbFilter !== 'tous') arr = arr.filter(l => nbState(l) === nbFilter);
+  if (q) arr = arr.filter(l => (l.name + ' ' + l.email + ' ' + l.phone + ' ' + phoneDigits(l.phone) + ' ' + l.notes).toLowerCase().includes(q));
+  const by = {
+    recent: (a, b) => String(b.created).localeCompare(String(a.created)),
+    old: (a, b) => String(a.created).localeCompare(String(b.created)),
+    qualif: nbOrder,
+    next: (a, b) => (a.next_at || '9').localeCompare(b.next_at || '9') || String(b.created).localeCompare(String(a.created)),
+    name: (a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }),
+  };
+  arr.sort(by[prefs.nbSort] || by.recent);
+  if (!arr.length) {
+    const hint = nbFilter === 'due' ? "Personne à relancer aujourd'hui. Les plus anciens, jamais relancés, sont dans « Anciens jamais relancés »." : 'Aucun lead ici' + (nbPeriod !== 'all' ? ' sur cette période' : '') + '.';
+    return `<div class="card"><div class="empty">${hint}</div></div>`;
+  }
+  const more = arr.length > nbLimit ? `<div class="more"><button class="btn sec2 sm" onclick="nbLimit+=60;renderNbList()">Afficher ${Math.min(60, arr.length - nbLimit)} de plus (${arr.length - nbLimit} restants)</button></div>` : '';
+  return `<div class="count-line">${plural(arr.length, 'lead')}</div>` + arr.slice(0, nbLimit).map(nbCard).join('') + more;
+}
+function nbCard(l) {
+  const st = nbState(l), phone = !!phoneDigits(l.phone), open = isNb(l);
+  const y = String(l.created).slice(0, 4) !== TODAY().slice(0, 4);
+  const chips = [];
+  chips.push(`<span class="chip ${nbQualified(l) ? 'v' : ''}">${esc(l.ic_result || 'Non booké')}</span>`);
+  if (l.ic_event) chips.push(`<span class="chip">${esc(l.ic_event)}</span>`);
+  if (l.created) chips.push(`<span class="chip mono">arrivé ${esc(ago(l.created))} · ${esc(fmtDate(l.created, { day: 'numeric', month: 'short', year: y ? 'numeric' : undefined }))}</span>`);
+  if (l.touches) chips.push(`<span class="chip mono">${plural(l.touches, 'relance')}${l.last_touch ? ' · ' + esc(ago(l.last_touch)) : ''}</span>`);
+  if (!phone) chips.push('<span class="chip r">pas de numéro</span>');
+  let next = '';
+  if (open && l.touches && l.next_at) { const late = l.next_at < TODAY(); next = `<div class="next ${late ? 'late' : ''}"><b>${late ? 'En retard · ' : ''}${dayLabel(l.next_at)}</b><span>${esc(l.next_action || 'Relance')}</span></div>`; }
+  if (open && st === 'sansreponse') next = `<div class="next late"><b>Sans réponse</b><span>3 relances envoyées : clos-le ou tente un mail</span></div>`;
+  const noteLine = nbBooked(l) ? (String(l.notes).split('\n').find(x => /a réservé \(non booké/.test(x)) || '') : '';
+  let actions = '';
+  if (open) {
+    const k = kindOf(l);
+    actions = (phone ? `<button class="btn wa sm" onclick="sendWa('${l.id}')">WhatsApp · ${esc(tplShort(k))}</button>` : '')
+      + (l.email ? `<button class="btn sm ${phone ? 'sec2' : ''}" onclick="sendMail('${l.id}')">${phone ? 'Mail' : 'Mail · ' + esc(tplShort(k))}</button>` : '')
+      + `<button class="btn sm danger" onclick="nbClose('${l.id}')">Pas intéressé</button>`;
+  } else if (st === 'clos') actions = `<button class="btn sm sec2" onclick="nbReopen('${l.id}')">Remettre à relancer</button>`;
+  actions += `<button class="btn ghost sm" onclick="goLead('${l.id}')">Fiche</button>`;
+  return `<div class="card todo" id="nb-${l.id}">
+    <div class="t-head"><div><div class="name">${esc(l.name) || esc(l.email) || 'Sans nom'}</div>${next}</div>${open ? '' : `<span class="st ${stCls(l.status)}">${esc(stLabel(l.status))}</span>`}</div>
+    <div class="chips">${chips.join('')}</div>${noteLine ? `<div class="recap">${esc(noteLine)}</div>` : ''}
+    <div class="actions">${actions}</div></div>`;
+}
+function nbClose(id) { patch(id, { status: 'perdu', next_at: '', next_action: '' }); toast('Clos : pas intéressé'); }
+function nbReopen(id) {
+  const l = IX.lead[id]; if (!l) return;
+  const n = Number(l.touches) || 0;
+  patch(id, n >= 3 ? { status: 'nonbooke', touches: 0, next_at: '', next_action: '' } : { status: 'nonbooke', next_at: n ? TODAY() : '', next_action: n ? 'Relance non booké ' + (n + 1) : '' });
+  toast('Remis dans les non bookés à relancer');
+}
+
 // ================= CHIFFRES =================
 let srcSort = 'calls';
 function vChiffres() {
@@ -1716,7 +1866,7 @@ function vChiffres() {
   if (st.blank.length) html += `<div class="goulot r"><b>${plural(st.blank.length, 'call')} sans résultat sur la période</b><span>Les taux ne comptent que les calls remplis.</span><div class="gbtn"><button class="btn sm" onclick="startFill([${st.blank.map(c => `'${c.id}'`).join(',')}])">Remplir un par un</button></div></div>`;
   const dl = (a, b, k) => ps ? delta(a, b, k) : '';
   html += `<div class="kpis k8">
-    <div class="kpi click" onclick="goCalls('tous')"><div class="v">${st.booked.length}</div><div class="l">Calls bookés</div><div class="s">${st.annules.length} annulés ou reportés${dl(p === curKey() ? st.booked.filter(c => c.call_at.slice(0, 10) <= TODAY()).length : st.booked.length, ps && ps.booked.length)}</div></div>
+    <div class="kpi click" onclick="goCalls('tous')"><div class="v">${st.booked.length}</div><div class="l">Calls bookés</div><div class="s">${st.annules.length} annulés ou reportés${dl(cutToday(p) ? st.booked.filter(c => c.call_at.slice(0, 10) <= TODAY()).length : st.booked.length, ps && ps.booked.length)}</div></div>
     <div class="kpi click" onclick="goCalls('noshow')"><div class="v ${st.show === null ? 'm' : st.show >= 0.7 ? 'g' : 'o'}">${pc(st.show)}</div><div class="l">Show-up</div><div class="s">${st.tenus.length} tenus · ${st.noshow.length} no-show${dl(st.show, ps && ps.show, 'rate')}</div></div>
     <div class="kpi click" onclick="goCalls('vendu')"><div class="v ${st.closing === null ? 'm' : st.closing >= 0.25 ? 'g' : 'o'}">${pc(st.closing)}</div><div class="l">Closing</div><div class="s">${st.ventes.length} ventes · ${pc(st.closingP)} sur pitchés${dl(st.closing, ps && ps.closing, 'rate')}</div></div>
     <div class="kpi"><div class="v g">${euro(st.ca)}</div><div class="l">CA signé</div><div class="s">panier ${st.panier === null ? '–' : euro(st.panier)}${dl(st.ca, ps && ps.ca, 'eur')}</div></div>
@@ -1724,7 +1874,7 @@ function vChiffres() {
     <div class="kpi"><div class="v">${st.parCall === null ? '–' : euro(st.parCall)}</div><div class="l">CA par call tenu</div><div class="s">ce que rapporte un call</div></div>
     <div class="kpi click" onclick="goCalls('non_qualifie')"><div class="v ${st.qualif === null ? 'm' : st.qualif >= 6 ? 'g' : 'o'}">${st.qualif === null ? '–' : (Math.round(st.qualif * 10) / 10).toLocaleString('fr-FR') + '/10'}</div><div class="l">Qualité des leads</div><div class="s">${st.nq.length} pas qualifiés (${pc(ratio(st.nq.length, st.tenus.length))})</div></div>
     <div class="kpi click" onclick="goLeads('followup')"><div class="v o">${fuOpen.length}</div><div class="l">Follow-ups ouverts</div><div class="s">${fuVal ? euro(fuVal) + ' sur la table' : 'tous mois confondus'}</div></div>
-  </div>${ps && (ps.passes.length || ps.ventes.length) ? `<div class="count-line">Flèches : comparaison avec ${p === curKey() ? 'le mois dernier à la même date' : moisNom(monthShift(p, -1))}.</div>` : ''}`;
+  </div>${ps && (ps.passes.length || ps.ventes.length) ? `<div class="count-line">Flèches : comparaison avec ${esc(cmpLabel(p))}.</div>` : ''}`;
   // chaîne de conversion
   const chain = [['Calls bookés', st.booked.length], ['Gardent leur créneau', st.booked.length - st.annules.length], ['Calls tenus', st.tenus.length], ['Offre présentée', st.pitches.length], ['Ventes', st.ventes.length]];
   html += `<div class="card"><h2>De la réservation à la vente <small>${esc(perLabel(p))}</small></h2><p class="note">Les calls pas encore remplis ne sont comptés ni en tenus ni en no-show.</p><div class="chain">${chain.map(([lb, n], i) => { const prev = i ? chain[i - 1][1] : null; return `<div class="fl"><span>${lb}</span><div class="fb"><i style="width:${chain[0][1] ? Math.round(100 * n / chain[0][1]) : 0}%"></i></div><span class="fn">${n}</span><span class="fr">${i ? pc(ratio(n, prev)) : ''}</span></div>`; }).join('')}</div></div>`;
@@ -1791,7 +1941,7 @@ function openBrief() {
   const objs = {}; st.tenus.filter(c => c.result === 'followup' || c.result === 'perdu').forEach(c => objList(c.objection).map(objFamily).forEach(o => { objs[o] = (objs[o] || 0) + 1; }));
   const topObj = Object.entries(objs).sort((a, b) => b[1] - a[1])[0];
   const hot = fu.filter(l => l.temp === 'chaud').map(l => firstName(l.name) || l.name).slice(0, 5);
-  const lbl = p === 'all' ? 'depuis le début' : p === curKey() ? moisNom(p).toLowerCase() + ' (au ' + fmtDate(TODAY(), { day: 'numeric', month: 'long' }) + ')' : moisNom(p).toLowerCase();
+  const lbl = perLabel(p).toLowerCase() + (p === curKey() || p === 'w' ? ' (au ' + fmtDate(TODAY(), { day: 'numeric', month: 'long' }) + ')' : '');
   const lines = [
     `Point closing · ${lbl}`,
     `Calls tenus : ${st.tenus.length} sur ${st.passes.length} passés · show-up ${pc(st.show)}`,
